@@ -1,117 +1,56 @@
-import {
-  Bot,
-  Boxes,
-  GitBranch,
-  Laptop2,
-  Network,
-  TerminalSquare,
-} from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { AgentHub } from '@/components/control-center/agent-hub'
+import { CommandBlock } from '@/components/control-center/copy-button'
 import { GlassCard, SectionHeading } from '@/components/control-center/ui'
-import { getRepoSnapshot } from '@/lib/control-center-data'
-
-const environments = [
-  {
-    name: 'Claude Code',
-    path: '.claude → .agents/skills',
-    detail: 'Repository skills are exposed to Claude through a shared skill surface.',
-    icon: Bot,
-  },
-  {
-    name: 'Conductor',
-    path: '.conductor/',
-    detail: 'Parallel Claude Code worktrees with setup and run automation.',
-    icon: Network,
-  },
-  {
-    name: 'Agent skills',
-    path: '.agents/skills/',
-    detail: 'Operational knowledge for PRs, debugging, releases, testing and docs.',
-    icon: Boxes,
-  },
-  {
-    name: 'Developer shell',
-    path: 'package.json scripts',
-    detail: 'Common dev, test, lint, compiler and eval entry points.',
-    icon: TerminalSquare,
-  },
-]
+import { getAgentIntegrations, getSkillCatalog } from '@/lib/control-center-data'
 
 export default async function AgentsPage() {
-  const data = await getRepoSnapshot()
+  const [agents, skills] = await Promise.all([getAgentIntegrations(), getSkillCatalog()])
 
   return (
     <AppShell
       title="Agent workspace"
-      subtitle="The repository includes an operational layer for AI-assisted engineering: reusable skills, Claude integration and Conductor worktree orchestration."
+      titleAr="مساحة عمل الوكلاء"
+      subtitle="Understand every repository agent surface, copy launch and installation commands, and download configuration bundles for Claude Code, Codex, Hermes, Cursor and Conductor."
+      subtitleAr="افهم كل أسطح الوكلاء داخل المستودع وانسخ أوامر التشغيل والتثبيت ونزّل حزم الإعداد لـ Claude Code وCodex وHermes وCursor وConductor."
       eyebrow="Agent operations"
+      eyebrowAr="عمليات الوكلاء"
     >
-      <div className="grid gap-4 xl:grid-cols-[1.1fr_.9fr]">
-        <GlassCard className="p-6">
-          <SectionHeading
-            eyebrow="Architecture"
-            title="How agents enter the repository"
-            description="One shared knowledge layer, multiple execution surfaces."
-          />
-          <div className="relative space-y-3">
-            {environments.map((item) => {
-              const Icon = item.icon
-              return (
-                <div
-                  key={item.name}
-                  className="relative flex gap-4 rounded-[20px] border border-border/70 bg-background/35 p-4"
-                >
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-[15px] bg-primary/10 text-primary">
-                    <Icon className="size-4.5" />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="font-medium">{item.name}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-                    <p className="mt-2 font-mono text-[10px] text-primary/70">{item.path}</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+      <div className="mb-7 grid gap-3 md:grid-cols-3">
+        <GlassCard className="p-5">
+          <p className="text-xs text-muted-foreground">Agent integrations</p>
+          <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{agents.length}</p>
         </GlassCard>
-
-        <div className="space-y-4">
-          <GlassCard className="p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">
-              Parallel development
-            </p>
-            <div className="mt-5 flex items-center gap-4">
-              <span className="flex size-12 items-center justify-center rounded-[18px] bg-[#25002f] text-[#dfbce3]">
-                <GitBranch className="size-5" />
-              </span>
-              <div>
-                <p className="text-2xl font-semibold tracking-[-0.04em]">3–4 agents</p>
-                <p className="text-sm text-muted-foreground">Recommended Conductor concurrency</p>
-              </div>
-            </div>
-            <p className="mt-5 text-sm leading-6 text-muted-foreground">
-              Each agent works in an isolated git worktree, keeping parallel tasks from colliding while sharing the same repository conventions.
-            </p>
-          </GlassCard>
-
-          <GlassCard className="p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">
-              Knowledge surface
-            </p>
-            <p className="mt-3 text-4xl font-semibold tracking-[-0.05em]">
-              {data.agentSkills.length}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">repository-native agent skills</p>
-            <div className="mt-5 h-px bg-border" />
-            <div className="mt-5 flex items-center gap-3 text-sm">
-              <Laptop2 className="size-4 text-primary" />
-              <span className="text-muted-foreground">
-                Designed for local engineering workflows, not a remote admin service.
-              </span>
-            </div>
-          </GlassCard>
-        </div>
+        <GlassCard className="p-5">
+          <p className="text-xs text-muted-foreground">Shared skills</p>
+          <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{skills.length}</p>
+        </GlassCard>
+        <GlassCard className="p-5">
+          <p className="text-xs text-muted-foreground">Canonical skills path</p>
+          <p className="mt-3 truncate font-mono text-sm text-primary">.agents/skills</p>
+        </GlassCard>
       </div>
+
+      <div className="mb-8 grid gap-4 xl:grid-cols-[1fr_.85fr]">
+        <GlassCard className="p-5 sm:p-6">
+          <SectionHeading
+            eyebrow="Enter the repository"
+            title="Give any coding agent repository context"
+            description="Clone canary, enter the checkout, then start the agent from the repository root so local guidance and skills can be discovered."
+          />
+          <CommandBlock command="git clone --branch canary https://github.com/vercel/next.js.git && cd next.js" />
+        </GlassCard>
+        <GlassCard className="p-5 sm:p-6">
+          <SectionHeading
+            eyebrow="Shared convention"
+            title=".agents/skills"
+            description="The repository keeps deep workflows in a cross-tool skill directory. Claude bridges to it and Hermes recognizes it as a project-local skills location."
+          />
+          <CommandBlock command="find .agents/skills -maxdepth 2 -name SKILL.md -print" />
+        </GlassCard>
+      </div>
+
+      <AgentHub agents={agents} />
     </AppShell>
   )
 }
