@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import http from 'node:http'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,6 +7,9 @@ import { chromium } from 'playwright'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const publicDirectory = path.resolve(here, '../out')
+const screenshotsDirectory = path.resolve(here, '../artifacts')
+fs.mkdirSync(screenshotsDirectory, { recursive: true })
+
 const routes = [
   '/',
   '/framework',
@@ -80,6 +84,9 @@ try {
       }
     }
 
+    // Interaction checks always start from the same known route.
+    await page.goto(baseURL + '/', { waitUntil: 'networkidle' })
+
     if (viewport.width <= 390) {
       if (!(await page.locator('.mobile-dock').isVisible())) {
         failures.push(viewport.name + ': mobile dock is not visible')
@@ -95,11 +102,16 @@ try {
       }
 
       if (viewport.width >= 1440) {
-        await page.locator('.command-trigger').click()
-        if (!(await page.locator('.command-palette').isVisible())) {
-          failures.push(viewport.name + ': command palette did not open')
+        const commandTrigger = page.locator('.command-trigger')
+        if ((await commandTrigger.count()) === 0 || !(await commandTrigger.isVisible())) {
+          failures.push(viewport.name + ': command trigger is not visible')
+        } else {
+          await commandTrigger.click()
+          if (!(await page.locator('.command-palette').isVisible())) {
+            failures.push(viewport.name + ': command palette did not open')
+          }
+          await page.keyboard.press('Escape')
         }
-        await page.keyboard.press('Escape')
 
         const beforeTheme = await page.locator('html').getAttribute('data-theme')
         await page.getByRole('button', { name: 'Toggle color theme' }).click()
@@ -108,6 +120,13 @@ try {
           failures.push(viewport.name + ': theme toggle did not change the active theme')
         }
       }
+    }
+
+    if (viewport.name === 'phone-390' || viewport.name === 'desktop-1440') {
+      await page.screenshot({
+        path: path.join(screenshotsDirectory, 'overview-' + viewport.name + '.png'),
+        fullPage: true,
+      })
     }
 
     if (consoleErrors.length) {
