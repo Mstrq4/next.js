@@ -26,7 +26,7 @@ import {
   X,
   Zap,
 } from 'lucide-react'
-import Image from 'next/image'\nimport Link from 'next/link'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
