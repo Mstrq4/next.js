@@ -2,12 +2,16 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 
 const repoRoot = path.resolve(process.cwd(), '../..')
+export const upstreamRepo = 'vercel/next.js'
+export const upstreamBranch = 'canary'
+
+function repoPath(relativePath: string) {
+  return path.join(/* turbopackIgnore: true */ repoRoot, relativePath)
+}
 
 async function listDirectories(relativePath: string) {
   try {
-    const entries = await fs.readdir(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), {
-      withFileTypes: true,
-    })
+    const entries = await fs.readdir(repoPath(relativePath), { withFileTypes: true })
     return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
   } catch {
     return []
@@ -16,9 +20,7 @@ async function listDirectories(relativePath: string) {
 
 async function listFiles(relativePath: string, extension?: string) {
   try {
-    const entries = await fs.readdir(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), {
-      withFileTypes: true,
-    })
+    const entries = await fs.readdir(repoPath(relativePath), { withFileTypes: true })
     return entries
       .filter((entry) => entry.isFile() && (!extension || entry.name.endsWith(extension)))
       .map((entry) => entry.name)
@@ -30,11 +32,82 @@ async function listFiles(relativePath: string, extension?: string) {
 
 async function readJson<T>(relativePath: string): Promise<T | null> {
   try {
-    const source = await fs.readFile(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), 'utf8')
+    const source = await fs.readFile(repoPath(relativePath), 'utf8')
     return JSON.parse(source) as T
   } catch {
     return null
   }
+}
+
+async function readText(relativePath: string): Promise<string | null> {
+  try {
+    return await fs.readFile(repoPath(relativePath), 'utf8')
+  } catch {
+    return null
+  }
+}
+
+async function walkFiles(relativePath: string): Promise<string[]> {
+  try {
+    const entries = await fs.readdir(repoPath(relativePath), { withFileTypes: true })
+    const nested = await Promise.all(
+      entries.map(async (entry) => {
+        const child = path.posix.join(relativePath, entry.name)
+        if (entry.isDirectory()) return walkFiles(child)
+        if (entry.isFile() || entry.isSymbolicLink()) return [child]
+        return []
+      })
+    )
+    return nested.flat().sort()
+  } catch {
+    return []
+  }
+}
+
+function parseFrontmatter(source: string) {
+  const match = source.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/)
+  const fields: Record<string, string> = {}
+  if (!match) return { fields, body: source }
+
+  const lines = match[1].split('\n')
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index]
+    const field = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/)
+    if (!field) continue
+    const key = field[1]
+    let value = field[2].trim()
+
+    if (value === '>' || value === '|') {
+      const parts: string[] = []
+      for (index += 1; index < lines.length; index++) {
+        const continuation = lines[index]
+        if (/^[A-Za-z0-9_-]+:\s*/.test(continuation)) {
+          index -= 1
+          break
+        }
+        parts.push(continuation.trim())
+      }
+      value = parts.filter(Boolean).join(' ')
+    }
+
+    fields[key] = value.replace(/^['"]|['"]$/g, '')
+  }
+
+  return { fields, body: source.slice(match[0].length).trim() }
+}
+
+function firstParagraph(markdown: string) {
+  const clean = markdown
+    .replace(/^#.*$/gm, '')
+    .replace(/\x60\x60\x60[\s\S]*?\x60\x60\x60/g, '')
+    .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+    .replace(/[*_>#-]/g, '')
+    .trim()
+  return clean.split(/\n\s*\n/)[0]?.replace(/\s+/g, ' ').trim() ?? ''
+}
+
+function rawUrl(filePath: string) {
+  return 'https://raw.githubusercontent.com/' + upstreamRepo + '/' + upstreamBranch + '/' + filePath
 }
 
 type RootPackage = {
@@ -48,6 +121,67 @@ type WorkspacePackage = {
   version?: string
   description?: string
   private?: boolean
+}
+
+export type SkillCatalogItem = {
+  slug: string
+  name: string
+  group: 'Agent skill' | 'Framework skill'
+  bundle: string
+  description: string
+  path: string
+  content: string
+  files: Array<{ path: string; url: string }>
+}
+
+const bundles: Record<string, string[]> = {
+  Delivery: ['backport-pr', 'create-pr', 'deploy-release-test', 'gh-stack', 'pr-status-triage'],
+  Runtime: [
+    'dce-edge',
+    'flags',
+    'gate-tests',
+    'next-rspack',
+    'react-sync',
+    'react-vendoring',
+    'router-act',
+    'runtime-debug',
+    'sandbox-bench',
+    'v8-jit',
+  ],
+  Documentation: ['authoring-skills', 'insight-error-page', 'update-docs', 'write-api-reference', 'write-guide'],
+}
+
+function bundleForSkill(name: string, group: SkillCatalogItem['group']) {
+  if (group === 'Framework skill') return 'Next.js application'
+  for (const [bundle, names] of Object.entries(bundles)) {
+    if (names.includes(name)) return bundle
+  }
+  return 'Repository'
+}
+
+async function loadSkill(
+  slug: string,
+  group: SkillCatalogItem['group'],
+  basePath: string
+): Promise<SkillCatalogItem> {
+  const skillPath = basePath + '/' + slug
+  const source = (await readText(skillPath + '/SKILL.md')) ?? ''
+  const parsed = parseFrontmatter(source)
+  const files = await walkFiles(skillPath)
+
+  return {
+    slug,
+    name: parsed.fields.name || slug,
+    group,
+    bundle: bundleForSkill(slug, group),
+    description:
+      parsed.fields.description ||
+      firstParagraph(parsed.body) ||
+      'Repository-aware development workflow.',
+    path: skillPath,
+    content: source,
+    files: files.map((filePath) => ({ path: filePath, url: rawUrl(filePath) })),
+  }
 }
 
 export async function getRepoSnapshot() {
@@ -67,7 +201,7 @@ export async function getRepoSnapshot() {
 
   return {
     agentSkills,
-    frameworkSkills,
+    frameworkSkills: frameworkSkills.filter((name) => !name.startsWith('.')),
     packages,
     workflows,
     rustCrates,
@@ -85,61 +219,198 @@ export async function getRepoSnapshot() {
   }
 }
 
-const skillDescriptions: Record<string, string> = {
-  'authoring-skills': 'Create and maintain agent skills with repository conventions.',
-  'backport-pr': 'Backport selected pull requests across release branches.',
-  'create-pr': 'Prepare and create review-ready pull requests.',
-  'dce-edge': 'Debug dead-code elimination behavior in edge builds.',
-  'deploy-release-test': 'Exercise release artifacts through deployment tests.',
-  flags: 'Inspect and work with framework feature flags.',
-  'gate-tests': 'Choose and run the correct test gates for a change.',
-  'gh-stack': 'Work with stacked GitHub pull-request workflows.',
-  'insight-error-page': 'Diagnose and improve framework error experiences.',
-  'next-rspack': 'Develop and validate the Next.js Rspack integration.',
-  'pr-status-triage': 'Triage pull-request CI and status checks.',
-  'react-sync': 'Synchronize React canary versions used by Next.js.',
-  'react-vendoring': 'Maintain React vendoring and built-in package boundaries.',
-  'router-act': 'Work on router actions and navigation behavior.',
-  'runtime-debug': 'Debug framework runtime behavior and regressions.',
-  'sandbox-bench': 'Benchmark isolated sandbox and development scenarios.',
-  'update-docs': 'Keep documentation aligned with implementation changes.',
-  'v8-jit': 'Investigate JavaScript JIT and V8-sensitive performance.',
-  'write-api-reference': 'Author API reference documentation.',
-  'write-guide': 'Author high-quality framework guides.',
-  'next-cache-components-adoption': 'Adopt Cache Components safely in App Router projects.',
-  'next-cache-components-optimizer': 'Increase the useful static shell produced by Cache Components.',
-  'next-dev-loop': 'Verify framework work against a live Next.js development loop.',
-  'next-partial-prefetching-adoption': 'Adopt partial prefetching while preserving navigation behavior.',
-  'next-partial-prefetching-optimizer': 'Optimize selected prefetch contracts after adoption.',
+export async function getSkillCatalog(): Promise<SkillCatalogItem[]> {
+  const snapshot = await getRepoSnapshot()
+  const skills = await Promise.all([
+    ...snapshot.agentSkills.map((name) => loadSkill(name, 'Agent skill', '.agents/skills')),
+    ...snapshot.frameworkSkills.map((name) => loadSkill(name, 'Framework skill', 'skills')),
+  ])
+  return skills.sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export async function getSkillCatalog() {
-  const snapshot = await getRepoSnapshot()
+export async function getSkillDetail(slug: string) {
+  const skills = await getSkillCatalog()
+  return skills.find((skill) => skill.slug === slug) ?? null
+}
 
-  return [
-    ...snapshot.agentSkills
-      .filter((name) => name !== 'README.md')
-      .map((name) => ({
-        name,
-        group: 'Agent skill',
-        description: skillDescriptions[name] ?? 'Repository-aware development workflow.',
-        path: `.agents/skills/${name}`,
-      })),
-    ...snapshot.frameworkSkills.map((name) => ({
-      name,
-      group: 'Framework skill',
-      description: skillDescriptions[name] ?? 'Next.js framework workflow.',
-      path: `skills/${name}`,
-    })),
+export async function getSkillBundles() {
+  const skills = await getSkillCatalog()
+  const grouped = new Map<string, SkillCatalogItem[]>()
+  for (const skill of skills) {
+    const current = grouped.get(skill.bundle) ?? []
+    current.push(skill)
+    grouped.set(skill.bundle, current)
+  }
+  return [...grouped.entries()].map(([name, items]) => ({
+    name,
+    skills: items,
+    files: items.flatMap((skill) => skill.files),
+  }))
+}
+
+export type AgentIntegration = {
+  slug: string
+  name: string
+  role: string
+  roleAr: string
+  description: string
+  descriptionAr: string
+  paths: string[]
+  files: Array<{ path: string; url: string }>
+  commands: Array<{ label: string; command: string }>
+}
+
+async function filesForPaths(paths: string[]) {
+  const files = (
+    await Promise.all(
+      paths.map(async (item) => {
+        try {
+          const stat = await fs.lstat(repoPath(item))
+          if (stat.isDirectory()) return walkFiles(item)
+          return [item]
+        } catch {
+          return []
+        }
+      })
+    )
+  ).flat()
+  return files.map((filePath) => ({ path: filePath, url: rawUrl(filePath) }))
+}
+
+export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
+  const definitions: Omit<AgentIntegration, 'files'>[] = [
+    {
+      slug: 'claude-code',
+      name: 'Claude Code',
+      role: 'Native repository skills + plugin marketplace',
+      roleAr: 'مهارات المستودع الأصلية + متجر الإضافة',
+      description:
+        'Uses the repository-local .claude/skills bridge, the Next.js Claude plugin marketplace, and CLAUDE.md guidance.',
+      descriptionAr:
+        'يستخدم جسر .claude/skills المحلي ومتجر إضافة Next.js وإرشادات CLAUDE.md.',
+      paths: ['.claude', '.claude-plugin', '.github/CLAUDE.md'],
+      commands: [
+        { label: 'Start Claude in the repository', command: 'claude' },
+        { label: 'Inspect repository guidance', command: 'cat AGENTS.md && cat .github/CLAUDE.md' },
+      ],
+    },
+    {
+      slug: 'codex',
+      name: 'Codex',
+      role: 'AGENTS.md + shared Agent Skills',
+      roleAr: 'AGENTS.md + مهارات Agent Skills المشتركة',
+      description:
+        'Reads repository guidance from AGENTS.md and can use the cross-tool .agents/skills convention for reusable workflows.',
+      descriptionAr:
+        'يقرأ تعليمات المستودع من AGENTS.md ويمكنه استخدام .agents/skills كسطح مشترك للمهارات.',
+      paths: ['AGENTS.md', '.agents/skills'],
+      commands: [
+        { label: 'Open Codex in the checkout', command: 'codex' },
+        { label: 'List repository skills', command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print' },
+      ],
+    },
+    {
+      slug: 'hermes',
+      name: 'Hermes Agent',
+      role: 'Project-local Agent Skills interoperability',
+      roleAr: 'توافق مباشر مع مهارات المشروع المحلية',
+      description:
+        'Hermes recognizes project-local .agents/skills and can also scan shared external skill directories.',
+      descriptionAr:
+        'يتعرف Hermes على .agents/skills داخل المشروع ويمكنه كذلك فحص مجلدات مهارات مشتركة خارجية.',
+      paths: ['.agents/skills', 'AGENTS.md'],
+      commands: [
+        { label: 'Start Hermes in the repository', command: 'hermes chat' },
+        { label: 'List available Hermes skills', command: 'hermes skills list' },
+      ],
+    },
+    {
+      slug: 'cursor',
+      name: 'Cursor',
+      role: 'Repository commands and worktree configuration',
+      roleAr: 'أوامر المستودع وإعدادات worktree',
+      description:
+        'Uses repository-local Cursor commands and worktree configuration, including the Graphite workflow command.',
+      descriptionAr:
+        'يستخدم أوامر Cursor وإعدادات worktree الموجودة داخل المستودع بما فيها سير عمل Graphite.',
+      paths: ['.cursor'],
+      commands: [
+        { label: 'Open the repository in Cursor', command: 'cursor .' },
+        { label: 'Read the Graphite workflow', command: 'cat .cursor/commands/gt-workflow.md' },
+      ],
+    },
+    {
+      slug: 'conductor',
+      name: 'Conductor',
+      role: 'Parallel Claude Code worktrees',
+      roleAr: 'مساحات عمل متوازية لـ Claude Code',
+      description:
+        'Creates isolated worktrees for multiple Claude Code agents with repository setup and run scripts.',
+      descriptionAr:
+        'ينشئ worktrees معزولة لعدة وكلاء Claude Code مع سكربتات إعداد وتشغيل خاصة بالمستودع.',
+      paths: ['.conductor'],
+      commands: [
+        { label: 'Run workspace setup', command: './.conductor/scripts/setup.sh' },
+        { label: 'List worktrees', command: 'git worktree list' },
+      ],
+    },
   ]
+
+  return Promise.all(
+    definitions.map(async (definition) => ({
+      ...definition,
+      files: await filesForPaths(definition.paths),
+    }))
+  )
+}
+
+export async function getRepositorySurface() {
+  const entries = await fs.readdir(repoRoot, { withFileTypes: true })
+  const important = new Set([
+    '.agents',
+    '.cargo',
+    '.claude-plugin',
+    '.claude',
+    '.conductor',
+    '.config',
+    '.cursor',
+    '.devcontainer',
+    '.github',
+    '.husky',
+    '.vscode',
+    'apps',
+    'crates',
+    'docs',
+    'examples',
+    'packages',
+    'scripts',
+    'skills',
+    'test',
+    'turbopack',
+    'AGENTS.md',
+    'package.json',
+    'pnpm-workspace.yaml',
+    'turbo.json',
+  ])
+
+  return entries
+    .filter((entry) => important.has(entry.name))
+    .map((entry) => ({
+      name: entry.name,
+      type: entry.isDirectory() ? ('dir' as const) : ('file' as const),
+      path: entry.name,
+    }))
+    .sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'dir' ? -1 : 1
+      return a.name.localeCompare(b.name)
+    })
 }
 
 export async function getPackageCatalog() {
   const packageDirs = await listDirectories('packages')
-
   return Promise.all(
     packageDirs.map(async (directory) => {
-      const pkg = await readJson<WorkspacePackage>(`packages/${directory}/package.json`)
+      const pkg = await readJson<WorkspacePackage>('packages/' + directory + '/package.json')
       return {
         directory,
         name: pkg?.name ?? directory,
@@ -169,5 +440,7 @@ export async function getWorkflowCatalog() {
             : file.includes('test') || file.includes('build')
               ? 'CI'
               : 'Automation',
+    githubUrl: 'https://github.com/' + upstreamRepo + '/actions/workflows/' + file,
+    command: 'gh workflow run ' + file + ' --repo ' + upstreamRepo,
   }))
 }
