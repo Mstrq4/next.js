@@ -105,9 +105,11 @@
     "with-turbo": "cross-env IS_TURBOPACK_TEST=1",
     "with-webpack": "cross-env IS_WEBPACK_TEST=1",
     "with-experimental": "cross-env __NEXT_CACHE_COMPONENTS=true",
-    "studio": "pnpm next dev apps/repo-studio",
-    "studio:build": "pnpm next build apps/repo-studio",
-    "studio:start": "pnpm next start apps/repo-studio"
+    "studio": "pnpm studio:prepare && pnpm next dev apps/repo-studio",
+    "studio:build": "pnpm studio:prepare && pnpm next build apps/repo-studio",
+    "studio:prepare": "pnpm --filter=next build",
+    "studio:serve": "node apps/repo-studio/scripts/serve.mjs",
+    "studio:smoke": "node apps/repo-studio/scripts/smoke.mjs"
   },
   "devDependencies": {
     "@actions/core": "1.10.1",

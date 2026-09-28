@@ -38,6 +38,8 @@ export const navItems: NavItem[] = [
   { href: '/packages', label: 'Packages', shortLabel: 'Packages', description: 'Workspace packages and published surfaces', icon: 'package' },
   { href: '/tooling', label: 'Toolchain', shortLabel: 'Tools', description: 'Scripts, compilers, bundlers and developer commands', icon: 'terminal' },
   { href: '/skills', label: 'Agents & Skills', shortLabel: 'Skills', description: 'Repository agent workflows and public skills', icon: 'sparkles' },
+  { href: '/evals', label: 'Evals', shortLabel: 'Evals', description: 'Agent evaluation suites and upgrade scenarios', icon: 'activity' },
+  { href: '/automation', label: 'Automation', shortLabel: 'CI', description: 'GitHub workflows, local actions and repository automation', icon: 'branch' },
   { href: '/testing', label: 'Test Lab', shortLabel: 'Tests', description: 'Test suites, modes and bundler coverage', icon: 'flask' },
   { href: '/benchmarks', label: 'Benchmarks', shortLabel: 'Bench', description: 'Performance labs and benchmark projects', icon: 'gauge' },
   { href: '/docs', label: 'Docs & Examples', shortLabel: 'Docs', description: 'Documentation areas and example applications', icon: 'book' },

@@ -52,6 +52,11 @@ export default function FrameworkPage() {
 
       <SectionTitle title="Source module catalog" description="Generated from packages/next/src at build time" icon="layers" />
       <CatalogGrid items={repo.frameworkModules} placeholder="Search framework modules" />
+
+      <div className="mt-9">
+        <SectionTitle title="Framework error catalog" description="Error guidance and diagnostic messages under errors/" icon="activity" />
+        <CatalogGrid items={repo.errors} placeholder="Search framework errors" />
+      </div>
     </>
   )
 }

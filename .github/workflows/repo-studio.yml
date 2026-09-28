@@ -23,7 +23,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -39,3 +39,5 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build Next Studio
         run: pnpm studio:build
+      - name: Browser smoke matrix
+        run: pnpm studio:smoke

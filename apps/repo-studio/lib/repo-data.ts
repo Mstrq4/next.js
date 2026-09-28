@@ -1,6 +1,5 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { cache } from 'react'
 
 export type CatalogItem = {
   name: string
@@ -20,6 +19,9 @@ export type RepoSnapshot = {
   agentSkills: CatalogItem[]
   publicSkills: CatalogItem[]
   scripts: CatalogItem[]
+  automation: CatalogItem[]
+  evals: CatalogItem[]
+  errors: CatalogItem[]
   tests: CatalogItem[]
   benchmarks: CatalogItem[]
   docs: CatalogItem[]
@@ -32,6 +34,9 @@ export type RepoSnapshot = {
     frameworkModules: number
     skills: number
     scripts: number
+    automation: number
+    evals: number
+    errors: number
     tests: number
     benchmarks: number
     docs: number
@@ -93,6 +98,22 @@ function listDirectories(relativePath: string) {
     return fs
       .readdirSync(absolute(relativePath), { withFileTypes: true })
       .filter((entry) => entry.isDirectory() && !ignoredDirectories.has(entry.name))
+      .map((entry) => entry.name)
+      .sort((a, b) => a.localeCompare(b))
+  } catch {
+    return []
+  }
+}
+
+function listFiles(relativePath: string, extensions?: string[]) {
+  try {
+    return fs
+      .readdirSync(absolute(relativePath), { withFileTypes: true })
+      .filter((entry) => {
+        if (!entry.isFile()) return false
+        if (!extensions?.length) return true
+        return extensions.some((extension) => entry.name.endsWith(extension))
+      })
       .map((entry) => entry.name)
       .sort((a, b) => a.localeCompare(b))
   } catch {
@@ -215,6 +236,29 @@ function buildSnapshot(): RepoSnapshot {
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
 
+  const automation = [
+    ...listFiles('.github/workflows', ['.yml', '.yaml']).map((name) => ({
+      name: name.replace(/\.ya?ml$/, ''),
+      subtitle: 'GitHub Actions workflow',
+      path: '.github/workflows/' + name,
+      meta: 'workflow',
+      href: githubUrl('.github/workflows/' + name),
+    })),
+    ...catalogFromDirectory('.github/actions', 'Reusable local GitHub Action').map((item) => ({
+      ...item,
+      meta: 'local action',
+    })),
+  ]
+
+  const evals = catalogFromDirectory('evals/evals', 'Agent evaluation suite')
+  const errors = listFiles('errors', ['.mdx', '.md']).map((name) => ({
+    name: name.replace(/\.mdx?$/, ''),
+    subtitle: 'Framework error guidance',
+    path: 'errors/' + name,
+    meta: 'error doc',
+    href: githubUrl('errors/' + name),
+  }))
+
   const tests = catalogFromDirectory('test', 'Next.js test suite')
   const benchmarks = catalogFromDirectory('bench', 'Performance benchmark workspace')
   const docs = catalogFromDirectory('docs', 'Documentation section')
@@ -250,6 +294,9 @@ function buildSnapshot(): RepoSnapshot {
     agentSkills,
     publicSkills,
     scripts,
+    automation,
+    evals,
+    errors,
     tests,
     benchmarks,
     docs,
@@ -262,6 +309,9 @@ function buildSnapshot(): RepoSnapshot {
       frameworkModules: frameworkModules.length,
       skills: agentSkills.length + publicSkills.length,
       scripts: scripts.length,
+      automation: automation.length,
+      evals: evals.length,
+      errors: errors.length,
       tests: tests.reduce((sum, item) => sum + Number.parseInt(item.meta || '0', 10), 0),
       benchmarks: benchmarks.length,
       docs: docs.length,
@@ -271,4 +321,9 @@ function buildSnapshot(): RepoSnapshot {
   }
 }
 
-export const getRepoSnapshot = cache(buildSnapshot)
+let snapshotCache: RepoSnapshot | undefined
+
+export function getRepoSnapshot() {
+  snapshotCache ??= buildSnapshot()
+  return snapshotCache
+}
