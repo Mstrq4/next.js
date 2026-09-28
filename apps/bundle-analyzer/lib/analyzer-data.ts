@@ -13,8 +13,8 @@ export function analyzeDataUrl(baseDir: string, route: string): string {
   return `${baseDir}/${route.replace(/^\//, '')}/analyze.data`
 }
 
-export function useHistoryIndex() {
-  return useSWR<HistoryIndex>('/history/history.json', jsonFetcher, {
+export function useHistoryIndex(historyBaseDir = '/history') {
+  return useSWR<HistoryIndex>(historyBaseDir + '/history.json', jsonFetcher, {
     ...staticDataOptions,
     shouldRetryOnError: false,
   })
