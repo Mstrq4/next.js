@@ -230,3 +230,19 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+
+@keyframes nf-splash-progress {
+  from {
+    transform: scaleX(0);
+    opacity: 0.45;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+[dir='rtl'] .nf-rtl-flip {
+  transform: scaleX(-1);
+}

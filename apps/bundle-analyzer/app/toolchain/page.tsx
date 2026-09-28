@@ -63,8 +63,11 @@ export default async function ToolchainPage() {
   return (
     <AppShell
       title="Compiler & runtime toolchain"
+      titleAr="سلسلة المترجم وبيئة التشغيل"
       subtitle="A layered view of the technologies that build, execute and validate Next.js—from React and TypeScript to native Rust crates, Turbopack, SWC and Rspack."
+      subtitleAr="عرض طبقي للتقنيات التي تبني Next.js وتشغله وتتحقق منه، من React وTypeScript إلى حزم Rust الأصلية وTurbopack وSWC وRspack."
       eyebrow="Engineering toolchain"
+      eyebrowAr="سلسلة الأدوات الهندسية"
     >
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {layers.map((layer) => {

@@ -3,17 +3,19 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Activity,
+  BookOpen,
   Boxes,
   Braces,
   ChartNoAxesCombined,
   ChevronRight,
   Command,
   GitBranch,
-  GitPullRequest,
+  FolderTree,
+  Github,
   Home,
+  Languages,
   Menu,
   Moon,
-  PackageOpen,
   Play,
   Search,
   Sparkles,
@@ -30,41 +32,47 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useI18n } from './i18n-provider'
 
 const navGroups = [
   {
     label: 'Workspace',
+    labelAr: 'مساحة العمل',
     items: [
-      { href: '/', label: 'Overview', icon: Home },
-      { href: '/skills', label: 'Skills', icon: Sparkles },
-      { href: '/agents', label: 'Agents', icon: Braces },
-      { href: '/packages', label: 'Packages', icon: Boxes },
+      { href: '/', label: 'Overview', labelAr: 'نظرة عامة', icon: Home },
+      { href: '/skills', label: 'Skills', labelAr: 'المهارات', icon: Sparkles },
+      { href: '/agents', label: 'Agents', labelAr: 'الوكلاء', icon: Braces },
+      { href: '/packages', label: 'Packages', labelAr: 'الحزم', icon: Boxes },
+      { href: '/repository', label: 'Repository', labelAr: 'المستودع', icon: FolderTree },
     ],
   },
   {
     label: 'Engineering',
+    labelAr: 'الهندسة',
     items: [
-      { href: '/toolchain', label: 'Toolchain', icon: Wrench },
-      { href: '/testing', label: 'Testing', icon: TestTube2 },
-      { href: '/workflows', label: 'Workflows', icon: Workflow },
+      { href: '/toolchain', label: 'Toolchain', labelAr: 'سلسلة الأدوات', icon: Wrench },
+      { href: '/testing', label: 'Testing', labelAr: 'الاختبارات', icon: TestTube2 },
+      { href: '/workflows', label: 'Workflows', labelAr: 'سير العمل', icon: Workflow },
+      { href: '/docs', label: 'Documentation', labelAr: 'التوثيق', icon: BookOpen },
     ],
   },
   {
     label: 'Visual tools',
+    labelAr: 'الأدوات المرئية',
     items: [
-      { href: '/analyze', label: 'Bundle analyzer', icon: ChartNoAxesCombined },
-      { href: '/compare', label: 'Compare bundles', icon: Activity },
+      { href: '/analyze', label: 'Bundle analyzer', labelAr: 'محلل الحزم', icon: ChartNoAxesCombined },
+      { href: '/compare', label: 'Compare bundles', labelAr: 'مقارنة الحزم', icon: Activity },
     ],
   },
 ]
 
 const commands = [
-  { label: 'Start development', command: 'pnpm dev', icon: Play },
-  { label: 'Run Turbopack tests', command: 'pnpm test-turbo', icon: Zap },
-  { label: 'Run Rspack tests', command: 'pnpm test-rspack', icon: TestTube2 },
-  { label: 'Run lint suite', command: 'pnpm lint', icon: Braces },
-  { label: 'Run agent evals', command: 'pnpm eval', icon: WandSparkles },
-  { label: 'Build Turbopack CLI', command: 'pnpm build-turbopack-cli', icon: TerminalSquare },
+  { label: 'Start development', labelAr: 'بدء التطوير', command: 'pnpm dev', icon: Play },
+  { label: 'Run Turbopack tests', labelAr: 'تشغيل اختبارات Turbopack', command: 'pnpm test-turbo', icon: Zap },
+  { label: 'Run Rspack tests', labelAr: 'تشغيل اختبارات Rspack', command: 'pnpm test-rspack', icon: TestTube2 },
+  { label: 'Run lint suite', labelAr: 'تشغيل فحص الكود', command: 'pnpm lint', icon: Braces },
+  { label: 'Run agent evals', labelAr: 'تشغيل تقييمات الوكلاء', command: 'pnpm eval', icon: WandSparkles },
+  { label: 'Build Turbopack CLI', labelAr: 'بناء Turbopack CLI', command: 'pnpm build-turbopack-cli', icon: TerminalSquare },
 ]
 
 export function AppShell({
@@ -72,13 +80,20 @@ export function AppShell({
   title,
   subtitle,
   eyebrow,
+  titleAr,
+  subtitleAr,
+  eyebrowAr,
 }: {
   children: ReactNode
   title: string
   subtitle: string
   eyebrow?: string
+  titleAr?: string
+  subtitleAr?: string
+  eyebrowAr?: string
 }) {
   const pathname = usePathname()
+  const { language, toggleLanguage, t } = useI18n()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [commandOpen, setCommandOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -125,7 +140,7 @@ export function AppShell({
 
   const copyCommand = async (command: string) => {
     await navigator.clipboard.writeText(command)
-    setToast('Command copied to clipboard')
+    setToast(t('Command copied to clipboard', 'تم نسخ الأمر'))
     setCommandOpen(false)
   }
 
@@ -144,7 +159,7 @@ export function AppShell({
         </div>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold tracking-[-0.02em]">Next Forge</p>
-          <p className="truncate text-[11px] text-muted-foreground">Engineering Console</p>
+          <p className="truncate text-[11px] text-muted-foreground">{t('Engineering Console', 'لوحة الهندسة')}</p>
         </div>
       </div>
 
@@ -154,7 +169,7 @@ export function AppShell({
         {navGroups.map((group) => (
           <div key={group.label}>
             <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              {group.label}
+              {t(group.label, group.labelAr)}
             </p>
             <div className="space-y-1">
               {group.items.map((item) => {
@@ -173,8 +188,8 @@ export function AppShell({
                     }`}
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} />
-                    <span className="flex-1 truncate">{item.label}</span>
-                    {active ? <ChevronRight className="size-3.5 opacity-50" /> : null}
+                    <span className="flex-1 truncate">{t(item.label, item.labelAr)}</span>
+                    {active ? <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" /> : null}
                   </Link>
                 )
               })}
@@ -184,23 +199,22 @@ export function AppShell({
       </nav>
 
       <div className="border-t border-border pt-4">
-        <a
-          href="https://github.com/Mstrq4/next.js"
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          href="/repository"
+          onClick={() => mobile && setMobileOpen(false)}
           className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground"
         >
           <GitBranch className="size-[17px]" strokeWidth={1.8} />
-          <span className="flex-1">Repository</span>
+          <span className="flex-1">{t('Repository explorer', 'مستكشف المستودع')}</span>
           <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px]">canary</span>
-        </a>
+        </Link>
       </div>
     </div>
   )
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block">
+      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block rtl:left-auto rtl:right-4">
         <Sidebar />
       </aside>
 
@@ -211,8 +225,8 @@ export function AppShell({
             className="absolute inset-0 bg-[#16001c]/35 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="nf-glass-strong absolute inset-y-3 left-3 w-[min(86vw,300px)] rounded-[28px] p-3">
-            <div className="absolute right-4 top-4 z-10">
+          <aside className="nf-glass-strong absolute inset-y-3 left-3 w-[min(86vw,300px)] rounded-[28px] p-3 rtl:left-auto rtl:right-3">
+            <div className="absolute right-4 top-4 z-10 rtl:left-4 rtl:right-auto">
               <button
                 onClick={() => setMobileOpen(false)}
                 className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground"
@@ -226,7 +240,7 @@ export function AppShell({
         </div>
       ) : null}
 
-      <main className="min-w-0 lg:pl-[284px]">
+      <main className="min-w-0 lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]">
         <div className="mx-auto w-full max-w-[1720px] px-4 pb-12 pt-4 sm:px-6 lg:px-7">
           <header className="nf-glass sticky top-4 z-20 mb-6 flex min-h-16 items-center gap-3 rounded-[22px] px-3.5 sm:px-4">
             <button
@@ -239,9 +253,9 @@ export function AppShell({
 
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-medium text-muted-foreground">
-                {eyebrow ?? 'Next.js monorepo'}
+                {t(eyebrow ?? 'Next.js monorepo', eyebrowAr ?? 'مستودع Next.js')}
               </p>
-              <p className="truncate text-sm font-semibold sm:text-base">{title}</p>
+              <p className="truncate text-sm font-semibold sm:text-base">{t(title, titleAr ?? title)}</p>
             </div>
 
             <button
@@ -249,7 +263,7 @@ export function AppShell({
               className="hidden min-w-56 items-center gap-2 rounded-full border border-border bg-background/50 px-3.5 py-2 text-left text-xs text-muted-foreground transition-colors hover:bg-background/80 md:flex"
             >
               <Search className="size-3.5" />
-              <span className="flex-1">Search commands</span>
+              <span className="flex-1">{t('Search commands', 'ابحث في الأوامر')}</span>
               <kbd className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[10px]">⌘K</kbd>
             </button>
 
@@ -262,6 +276,16 @@ export function AppShell({
             </button>
 
             <button
+              onClick={toggleLanguage}
+              className="flex min-w-9 items-center justify-center gap-1 rounded-full bg-muted px-2.5 text-xs font-semibold text-muted-foreground transition-transform active:scale-95"
+              aria-label={t('Switch language', 'تبديل اللغة')}
+              title={t('Switch to Arabic', 'التبديل إلى الإنجليزية')}
+            >
+              <Languages className="size-3.5" />
+              <span>{language === 'ar' ? 'EN' : 'AR'}</span>
+            </button>
+
+            <button
               onClick={toggleTheme}
               className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition-transform active:scale-95"
               aria-label="Toggle color theme"
@@ -270,25 +294,26 @@ export function AppShell({
             </button>
 
             <a
-              href="https://github.com/Mstrq4/next.js/pulls"
+              href="https://github.com/vercel/next.js"
               target="_blank"
               rel="noreferrer"
               className="hidden size-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_rgba(111,47,125,.2)] sm:flex"
-              aria-label="Pull requests"
+              aria-label={t('Official Vercel Next.js repository', 'مستودع Next.js الرسمي من Vercel')}
+              title={t('Official repository', 'المستودع الرسمي')}
             >
-              <GitPullRequest className="size-4" />
+              <Github className="size-4" />
             </a>
           </header>
 
           <section className="mb-7 px-1 sm:px-2">
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/70">
-              {eyebrow ?? 'Engineering workspace'}
+              {t(eyebrow ?? 'Engineering workspace', eyebrowAr ?? 'مساحة العمل الهندسية')}
             </p>
             <h1 className="max-w-4xl text-3xl font-semibold tracking-[-0.045em] sm:text-4xl lg:text-[44px]">
-              {title}
+              {t(title, titleAr ?? title)}
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground sm:text-[15px]">
-              {subtitle}
+              {t(subtitle, subtitleAr ?? subtitle)}
             </p>
           </section>
 
@@ -340,13 +365,13 @@ export function AppShell({
                         <Icon className="size-4" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium">{item.label}</span>
+                        <span className="block text-sm font-medium">{t(item.label, item.labelAr)}</span>
                         <span className="mt-0.5 block truncate font-mono text-[11px] text-muted-foreground">
                           {item.command}
                         </span>
                       </span>
                       <span className="rounded-full bg-muted px-2 py-1 text-[10px] text-muted-foreground">
-                        Copy
+                        {t('Copy', 'نسخ')}
                       </span>
                     </button>
                   )

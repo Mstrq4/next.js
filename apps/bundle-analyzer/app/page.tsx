@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { AppShell } from '@/components/control-center/app-shell'
+import { CopyButton } from '@/components/control-center/copy-button'
 import {
   GlassCard,
   MetricBar,
@@ -66,8 +67,11 @@ export default async function HomePage() {
   return (
     <AppShell
       title="Repository intelligence, in one place."
+      titleAr="ذكاء المستودع في مكان واحد."
       subtitle="A visual engineering console for the Next.js monorepo—framework packages, agent skills, compilers, tests, workflows and repository commands without digging through hundreds of folders."
+      subtitleAr="لوحة هندسية مرئية لمستودع Next.js الأحادي: الحزم والمهارات والمترجمات والاختبارات وسير العمل والأوامر دون البحث يدويًا داخل مئات المجلدات."
       eyebrow="Next Forge · Control Center"
+      eyebrowAr="Next Forge · مركز التحكم"
     >
       <div className="relative mb-8 overflow-hidden rounded-[30px] border border-border bg-[#25002f] p-6 text-white shadow-[0_28px_90px_rgba(55,7,65,.22)] sm:p-8 lg:p-10">
         <div className="nf-grid pointer-events-none absolute inset-0 opacity-35" />
@@ -249,6 +253,7 @@ export default async function HomePage() {
                       {item.command}
                     </p>
                   </div>
+                  <CopyButton value={item.command} compact />
                 </div>
               )
             })}

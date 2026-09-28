@@ -8,6 +8,7 @@ import {
   TestTube2,
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { CopyButton, CommandBlock } from '@/components/control-center/copy-button'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getRepoSnapshot } from '@/lib/control-center-data'
 
@@ -47,9 +48,16 @@ export default async function TestingPage() {
   return (
     <AppShell
       title="Quality & testing laboratory"
-      subtitle="Next.js validates behavior across multiple runtimes and bundlers. This view turns the root test matrix into a readable map of the most important verification surfaces."
+      titleAr="مختبر الجودة والاختبارات"
+      subtitle="Next.js validates behavior across multiple runtimes and bundlers. Copy the exact repository commands for focused testing, browser verification and production-mode checks."
+      subtitleAr="يتحقق Next.js من السلوك عبر بيئات تشغيل وحزم متعددة. انسخ أوامر المستودع الدقيقة للاختبارات المركزة والتحقق عبر المتصفح واختبارات وضع الإنتاج."
       eyebrow="Quality engineering"
+      eyebrowAr="هندسة الجودة"
     >
+      <div className="mb-6 grid gap-3 lg:grid-cols-2">
+        <CommandBlock title="Generate a new test" command="pnpm new-test --args true my-feature e2e" />
+        <CommandBlock title="Fast unit verification" command="pnpm test-unit" />
+      </div>
       <div className="mb-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <GlassCard className="p-5">
           <TestTube2 className="size-5 text-primary" />
@@ -104,7 +112,8 @@ export default async function TestingPage() {
                     className="flex items-center gap-2 rounded-[14px] border border-border/70 bg-background/35 px-3 py-2.5"
                   >
                     <span className="size-1.5 rounded-full bg-emerald-500" />
-                    <code className="truncate text-[11px] text-muted-foreground">pnpm {key}</code>
+                    <code className="min-w-0 flex-1 truncate text-[11px] text-muted-foreground">pnpm {key}</code>
+                    <CopyButton value={'pnpm ' + key} compact />
                   </div>
                 ))}
               </div>
