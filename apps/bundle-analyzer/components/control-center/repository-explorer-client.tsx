@@ -7,6 +7,7 @@ import {
   FileCode2,
   Folder,
   FolderOpen,
+  FolderTree,
   Github,
   RefreshCw,
   Search,
