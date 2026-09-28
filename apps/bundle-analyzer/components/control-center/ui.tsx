@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { ArrowUpRight, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { LocalizedText, type Copy } from './locale-provider'
 
 export function GlassCard({
   children,
@@ -9,11 +10,7 @@ export function GlassCard({
   children: ReactNode
   className?: string
 }) {
-  return (
-    <section className={`nf-glass rounded-[24px] ${className}`}>
-      {children}
-    </section>
-  )
+  return <section className={`nf-glass rounded-[24px] ${className}`}>{children}</section>
 }
 
 export function SectionHeading({
@@ -22,25 +19,25 @@ export function SectionHeading({
   description,
   action,
 }: {
-  eyebrow?: string
-  title: string
-  description?: string
-  action?: { href: string; label: string }
+  eyebrow?: Copy
+  title: Copy
+  description?: Copy
+  action?: { href: string; label: Copy }
 }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
       <div className="min-w-0">
         {eyebrow ? (
           <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary/70">
-            {eyebrow}
+            <LocalizedText value={eyebrow} />
           </p>
         ) : null}
         <h2 className="text-xl font-semibold tracking-[-0.025em] sm:text-2xl">
-          {title}
+          <LocalizedText value={title} />
         </h2>
         {description ? (
           <p className="mt-1.5 max-w-2xl text-sm leading-6 text-muted-foreground">
-            {description}
+            <LocalizedText value={description} />
           </p>
         ) : null}
       </div>
@@ -49,8 +46,8 @@ export function SectionHeading({
           href={action.href}
           className="hidden items-center gap-1 text-sm font-medium text-primary transition-opacity hover:opacity-70 sm:flex"
         >
-          {action.label}
-          <ChevronRight className="size-4" />
+          <LocalizedText value={action.label} />
+          <ChevronRight className="size-4 rtl:rotate-180" />
         </Link>
       ) : null}
     </div>
@@ -63,9 +60,9 @@ export function StatCard({
   detail,
   icon,
 }: {
-  label: string
+  label: Copy
   value: string | number
-  detail: string
+  detail: Copy
   icon: ReactNode
 }) {
   return (
@@ -74,13 +71,11 @@ export function StatCard({
         <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform duration-300 group-hover:scale-105">
           {icon}
         </div>
-        <ArrowUpRight className="size-4 text-muted-foreground/50" />
+        <ArrowUpRight className="size-4 text-muted-foreground/50 rtl:-scale-x-100" />
       </div>
-      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">
-        {value}
-      </p>
-      <p className="mt-1 text-sm font-medium">{label}</p>
-      <p className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</p>
+      <p className="mt-6 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{value}</p>
+      <p className="mt-1 text-sm font-medium"><LocalizedText value={label} /></p>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground"><LocalizedText value={detail} /></p>
     </GlassCard>
   )
 }
@@ -110,15 +105,15 @@ export function MetricBar({
   value,
   percent,
 }: {
-  label: string
+  label: Copy
   value: string
   percent: number
 }) {
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-4 text-sm">
-        <span className="font-medium">{label}</span>
-        <span className="font-mono text-xs text-muted-foreground">{value}</span>
+        <span className="font-medium"><LocalizedText value={label} /></span>
+        <span dir="ltr" className="font-mono text-xs text-muted-foreground">{value}</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-primary/10">
         <div
@@ -136,17 +131,17 @@ export function EmptyState({
   description,
 }: {
   icon: ReactNode
-  title: string
-  description: string
+  title: Copy
+  description: Copy
 }) {
   return (
     <GlassCard className="flex min-h-72 flex-col items-center justify-center p-8 text-center">
       <div className="mb-4 flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
         {icon}
       </div>
-      <h3 className="font-semibold">{title}</h3>
+      <h3 className="font-semibold"><LocalizedText value={title} /></h3>
       <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-        {description}
+        <LocalizedText value={description} />
       </p>
     </GlassCard>
   )
