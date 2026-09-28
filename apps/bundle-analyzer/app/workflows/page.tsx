@@ -1,5 +1,6 @@
 import {
   Boxes,
+  ExternalLink,
   GitPullRequest,
   Rocket,
   ShieldCheck,
@@ -7,6 +8,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { CopyButton } from '@/components/control-center/copy-button'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getWorkflowCatalog } from '@/lib/control-center-data'
 
@@ -28,8 +30,11 @@ export default async function WorkflowsPage() {
   return (
     <AppShell
       title="GitHub automation"
-      subtitle="Builds, integration tests, release jobs, Rspack verification, Turbopack benchmarks and repository triage are coordinated by a broad Actions surface."
+      titleAr="أتمتة GitHub"
+      subtitle="Inspect every workflow, open its live Actions page and copy the GitHub CLI command used to dispatch it when your account has permission."
+      subtitleAr="افحص كل سير عمل وافتح صفحة Actions الفعلية وانسخ أمر GitHub CLI لتشغيله عندما يملك حسابك الصلاحية."
       eyebrow="CI & automation"
+      eyebrowAr="التكامل المستمر والأتمتة"
     >
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {['CI', 'Release', 'Rspack', 'Turbopack', 'Automation'].map((category) => {
@@ -67,7 +72,20 @@ export default async function WorkflowsPage() {
               <h3 className="mt-5 text-sm font-semibold">{workflow.name}</h3>
               <div className="mt-4 flex items-center gap-2 rounded-[14px] bg-muted/70 px-3 py-2 font-mono text-[10px] text-muted-foreground">
                 <GitPullRequest className="size-3.5" />
-                <span className="truncate">{workflow.file}</span>
+                <span className="min-w-0 flex-1 truncate">{workflow.file}</span>
+                <CopyButton value={workflow.command} compact />
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <a
+                  href={workflow.githubUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-background/45 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <ExternalLink className="size-3.5" />
+                  Open workflow
+                </a>
+                <CopyButton value={workflow.command} label="Copy run command" />
               </div>
             </GlassCard>
           )
