@@ -10,14 +10,12 @@ import {
   ChevronRight,
   Command,
   GitBranch,
-  ExternalLink,
   FolderTree,
   Github,
   Home,
   Languages,
   Menu,
   Moon,
-  PackageOpen,
   Play,
   Search,
   Sparkles,
@@ -191,7 +189,7 @@ export function AppShell({
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} />
                     <span className="flex-1 truncate">{t(item.label, item.labelAr)}</span>
-                    {active ? <ChevronRight className="size-3.5 opacity-50" /> : null}
+                    {active ? <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" /> : null}
                   </Link>
                 )
               })}
@@ -216,7 +214,7 @@ export function AppShell({
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block">
+      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block rtl:left-auto rtl:right-4">
         <Sidebar />
       </aside>
 
@@ -227,8 +225,8 @@ export function AppShell({
             className="absolute inset-0 bg-[#16001c]/35 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           />
-          <aside className="nf-glass-strong absolute inset-y-3 left-3 w-[min(86vw,300px)] rounded-[28px] p-3">
-            <div className="absolute right-4 top-4 z-10">
+          <aside className="nf-glass-strong absolute inset-y-3 left-3 w-[min(86vw,300px)] rounded-[28px] p-3 rtl:left-auto rtl:right-3">
+            <div className="absolute right-4 top-4 z-10 rtl:left-4 rtl:right-auto">
               <button
                 onClick={() => setMobileOpen(false)}
                 className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground"
@@ -242,7 +240,7 @@ export function AppShell({
         </div>
       ) : null}
 
-      <main className="min-w-0 lg:pl-[284px]">
+      <main className="min-w-0 lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]">
         <div className="mx-auto w-full max-w-[1720px] px-4 pb-12 pt-4 sm:px-6 lg:px-7">
           <header className="nf-glass sticky top-4 z-20 mb-6 flex min-h-16 items-center gap-3 rounded-[22px] px-3.5 sm:px-4">
             <button
