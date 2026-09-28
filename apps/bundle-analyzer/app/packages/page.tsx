@@ -9,8 +9,11 @@ export default async function PackagesPage() {
   return (
     <AppShell
       title="Workspace packages"
+      titleAr="حزم مساحة العمل"
       subtitle="The public framework is assembled from focused workspace packages: Next.js core, SWC bindings, routing, linting, fonts, codemods, testing integrations and more."
+      subtitleAr="يتكون إطار Next.js من حزم مساحة عمل متخصصة تشمل النواة وروابط SWC والتوجيه والفحص والخطوط وأدوات التحويل وتكاملات الاختبار وغيرها."
       eyebrow="Monorepo packages"
+      eyebrowAr="حزم المستودع الأحادي"
     >
       <SectionHeading
         eyebrow="packages/"
