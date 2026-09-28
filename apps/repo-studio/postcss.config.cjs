@@ -1,5 +1,7 @@
 module.exports = {
   plugins: {
-    tailwindcss: {},
+    tailwindcss: {
+      config: './apps/repo-studio/tailwind.config.cjs',
+    },
   },
 }
