@@ -19,15 +19,18 @@ export default function GlobalError({
             <h1 className="mt-6 text-2xl font-semibold tracking-[-0.04em]">
               The console could not start.
             </h1>
+            <p dir="rtl" className="mt-2 text-lg font-semibold">
+              تعذّر تشغيل المنصة.
+            </p>
             <p className="mt-3 text-sm leading-6 text-[#cdbbd1]">
-              Retry the application shell. Repository files and development data are unaffected.
+              Retry the application shell. / أعد تشغيل واجهة التطبيق.
             </p>
             <button
               onClick={reset}
               className="mt-7 inline-flex min-h-10 items-center gap-2 rounded-full bg-[#d2a8d5] px-4 text-sm font-medium text-[#25002f]"
             >
               <RotateCcw className="size-4" />
-              Restart console
+              Restart / إعادة التشغيل
             </button>
           </div>
         </div>

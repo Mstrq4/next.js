@@ -230,3 +230,62 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* Next Forge locale + splash */
+html[dir='rtl'] body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+}
+
+html[dir='rtl'] .nf-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.nf-splash {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(222, 192, 239, 0.22), transparent 30rem),
+    radial-gradient(circle at 82% 80%, rgba(116, 49, 122, 0.28), transparent 34rem),
+    color-mix(in srgb, var(--background) 96%, #25002f 4%);
+  animation: nf-splash-enter 420ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+.nf-splash-leaving {
+  pointer-events: none;
+  animation: nf-splash-exit 430ms cubic-bezier(.4,0,1,1) both;
+}
+
+.nf-splash-mark {
+  animation: nf-splash-mark 900ms cubic-bezier(.2,.9,.2,1) both;
+}
+
+.nf-splash-progress {
+  width: 100%;
+  transform-origin: left center;
+  animation: nf-splash-progress 1.35s cubic-bezier(.22,.61,.36,1) both;
+}
+
+html[dir='rtl'] .nf-splash-progress {
+  transform-origin: right center;
+}
+
+@keyframes nf-splash-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes nf-splash-exit {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(1.015); }
+}
+
+@keyframes nf-splash-mark {
+  0% { opacity: 0; transform: translateY(10px) scale(.82) rotate(-3deg); filter: blur(8px); }
+  55% { opacity: 1; filter: blur(0); }
+  100% { transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes nf-splash-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
