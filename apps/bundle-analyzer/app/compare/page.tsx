@@ -1,5 +1,5 @@
-import { CompareAnalyzer } from '@/components/analyzer'
+import { AnalyzerAvailabilityGate } from '@/components/control-center/analyzer-availability-gate'
 
 export default function ComparePage() {
-  return <CompareAnalyzer />
+  return <AnalyzerAvailabilityGate mode="compare" />
 }
