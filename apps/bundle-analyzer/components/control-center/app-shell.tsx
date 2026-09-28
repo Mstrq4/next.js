@@ -133,13 +133,13 @@ export function AppShell({
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-3 py-3">
         <div className="flex size-11 items-center justify-center rounded-[18px] bg-[#25002f] shadow-[0_12px_30px_rgba(79,16,89,.22)]">
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element -- local UI brand mark; fixed dimensions and no optimization needed */}
+          <img
             src="/next-forge-mark.png"
             alt=""
             width={36}
             height={36}
             className="size-9 object-contain"
-            priority
           />
         </div>
         <div className="min-w-0">
