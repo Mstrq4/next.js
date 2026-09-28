@@ -1,12 +1,13 @@
 import {
   Boxes,
-  GitPullRequest,
+  ExternalLink,
   Rocket,
   ShieldCheck,
   Workflow,
   Zap,
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { LiveActionsStatus } from '@/components/control-center/live-actions-status'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getWorkflowCatalog } from '@/lib/control-center-data'
 
@@ -27,9 +28,12 @@ export default async function WorkflowsPage() {
 
   return (
     <AppShell
-      title="GitHub automation"
-      subtitle="Builds, integration tests, release jobs, Rspack verification, Turbopack benchmarks and repository triage are coordinated by a broad Actions surface."
-      eyebrow="CI & automation"
+      title={{ en: 'GitHub automation', ar: 'أتمتة GitHub' }}
+      subtitle={{
+        en: 'Browse the actual workflow definitions in .github/workflows and monitor the latest canary runs directly from GitHub.',
+        ar: 'استعرض ملفات سير العمل الفعلية داخل .github/workflows وراقب أحدث تشغيلات canary مباشرة من GitHub.',
+      }}
+      eyebrow={{ en: 'CI & automation', ar: 'CI والأتمتة' }}
     >
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {['CI', 'Release', 'Rspack', 'Turbopack', 'Automation'].map((category) => {
@@ -37,25 +41,32 @@ export default async function WorkflowsPage() {
           return (
             <GlassCard key={category} className="p-4">
               <Icon className="size-4 text-primary" />
-              <p className="mt-4 text-2xl font-semibold tracking-[-0.04em]">
-                {counts[category] ?? 0}
-              </p>
+              <p className="mt-4 text-2xl font-semibold">{counts[category] ?? 0}</p>
               <p className="mt-1 text-xs text-muted-foreground">{category}</p>
             </GlassCard>
           )
         })}
       </div>
 
+      <div className="mb-8">
+        <LiveActionsStatus />
+      </div>
+
       <SectionHeading
         eyebrow=".github/workflows"
-        title="Workflow catalog"
-        description="Every card maps to an existing workflow definition on the canary branch."
+        title={{ en: 'Workflow catalog', ar: 'كتالوج سير العمل' }}
+        description={{
+          en: 'Every item below maps to a real workflow definition on canary and opens the source file on GitHub.',
+          ar: 'كل عنصر أدناه مرتبط بملف Workflow حقيقي على canary ويمكن فتح مصدره على GitHub.',
+        }}
       />
+
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {workflows.map((workflow) => {
-          const Icon = categoryIcon[workflow.category as keyof typeof categoryIcon] ?? Workflow
+          const Icon =
+            categoryIcon[workflow.category as keyof typeof categoryIcon] ?? Workflow
           return (
-            <GlassCard key={workflow.file} className="p-5">
+            <GlassCard key={workflow.file} className="flex min-h-52 flex-col p-5">
               <div className="flex items-start justify-between gap-3">
                 <span className="flex size-10 items-center justify-center rounded-[15px] bg-primary/10 text-primary">
                   <Icon className="size-4.5" />
@@ -65,10 +76,21 @@ export default async function WorkflowsPage() {
                 </Pill>
               </div>
               <h3 className="mt-5 text-sm font-semibold">{workflow.name}</h3>
-              <div className="mt-4 flex items-center gap-2 rounded-[14px] bg-muted/70 px-3 py-2 font-mono text-[10px] text-muted-foreground">
-                <GitPullRequest className="size-3.5" />
-                <span className="truncate">{workflow.file}</span>
+              <div
+                dir="ltr"
+                className="mt-3 truncate rounded-[12px] bg-muted/70 px-3 py-2 text-left font-mono text-[10px] text-muted-foreground"
+              >
+                {workflow.path}
               </div>
+              <a
+                href={`https://github.com/Mstrq4/next.js/blob/canary/${workflow.path}`}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-auto inline-flex min-h-9 items-center justify-center gap-2 rounded-full border border-border bg-background/50 px-3 text-xs font-medium"
+              >
+                <ExternalLink className="size-3.5" />
+                Open workflow
+              </a>
             </GlassCard>
           )
         })}
