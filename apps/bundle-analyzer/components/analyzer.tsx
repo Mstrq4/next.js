@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 import useSWR from 'swr'
+import { useSearchParams } from 'next/navigation'
 import {
   CompareLayout,
   type CompareLayoutModel,
@@ -120,6 +121,10 @@ function AnalyzerFallback({ view }: { view: CompareView }) {
 }
 
 function useAnalyzerModel(compare: boolean) {
+  const searchParams = useSearchParams()
+  const sourceRoot = (searchParams.get('source') ?? '').replace(/\/$/, '')
+  const dataBaseDir = sourceRoot ? sourceRoot + '/data' : '/data'
+  const historyBaseDir = sourceRoot ? sourceRoot + '/history' : '/history'
   const [selectedSourceIndex, setSelectedSourceIndex] = useState<number | null>(
     null
   )
@@ -127,7 +132,7 @@ function useAnalyzerModel(compare: boolean) {
     null
   )
 
-  const { data: history, isLoading: isHistoryLoading } = useHistoryIndex()
+  const { data: history, isLoading: isHistoryLoading } = useHistoryIndex(historyBaseDir)
   const routeState = useAnalyzerRoute(compare, history?.snapshots)
   const {
     baselineSnapshot,
@@ -163,8 +168,8 @@ function useAnalyzerModel(compare: boolean) {
   const activeView = pendingView ?? compareView
   const isViewPending = pendingView != null && pendingView !== compareView
   const comparisonBaseDir = comparisonSnapshot
-    ? `/history/${comparisonSnapshot.id}`
-    : '/data'
+    ? historyBaseDir + '/' + comparisonSnapshot.id
+    : dataBaseDir
   const { data: modulesData } = useSWR(
     `${comparisonBaseDir}/modules.data`,
     fetchModulesData,
@@ -306,6 +311,7 @@ function useAnalyzerModel(compare: boolean) {
     filterSource,
     focusedSourceIndex,
     hoveredNodeInfo,
+    historyBaseDir,
     isHistoryLoading,
     isMouseInTreemap,
     isViewPending,
@@ -427,7 +433,7 @@ function ValidComparisonContent({
   model: AnalyzerModel
   baselineSnapshot: SnapshotMetadata
 }) {
-  const baselineBaseDir = `/history/${baselineSnapshot.id}`
+  const baselineBaseDir = model.historyBaseDir + '/' + baselineSnapshot.id
   const { data: baselineModulesData } = useSWR(
     `${baselineBaseDir}/modules.data`,
     fetchModulesData,
