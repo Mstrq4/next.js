@@ -5,7 +5,7 @@ const repoRoot = path.resolve(process.cwd(), '../..')
 
 async function listDirectories(relativePath: string) {
   try {
-    const entries = await fs.readdir(path.join(repoRoot, relativePath), {
+    const entries = await fs.readdir(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), {
       withFileTypes: true,
     })
     return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
@@ -16,7 +16,7 @@ async function listDirectories(relativePath: string) {
 
 async function listFiles(relativePath: string, extension?: string) {
   try {
-    const entries = await fs.readdir(path.join(repoRoot, relativePath), {
+    const entries = await fs.readdir(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), {
       withFileTypes: true,
     })
     return entries
@@ -30,7 +30,7 @@ async function listFiles(relativePath: string, extension?: string) {
 
 async function readJson<T>(relativePath: string): Promise<T | null> {
   try {
-    const source = await fs.readFile(path.join(repoRoot, relativePath), 'utf8')
+    const source = await fs.readFile(path.join(/* turbopackIgnore: true */ repoRoot, relativePath), 'utf8')
     return JSON.parse(source) as T
   } catch {
     return null
