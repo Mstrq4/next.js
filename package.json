@@ -107,7 +107,7 @@
     "with-experimental": "cross-env __NEXT_CACHE_COMPONENTS=true",
     "studio": "pnpm studio:prepare && pnpm next dev apps/repo-studio",
     "studio:build": "pnpm studio:prepare && pnpm next build apps/repo-studio",
-    "studio:prepare": "pnpm --filter=next build",
+    "studio:prepare": "pnpm turbo run build --filter=next...",
     "studio:serve": "node apps/repo-studio/scripts/serve.mjs",
     "studio:smoke": "node apps/repo-studio/scripts/smoke.mjs"
   },
