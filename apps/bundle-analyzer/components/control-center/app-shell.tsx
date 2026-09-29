@@ -16,6 +16,8 @@ import {
   Languages,
   Menu,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Play,
   Search,
   Sparkles,
@@ -99,9 +101,11 @@ export function AppShell({
   const [query, setQuery] = useState('')
   const [toast, setToast] = useState<string | null>(null)
   const [dark, setDark] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains('dark'))
+    setSidebarCollapsed(localStorage.getItem('next-forge-sidebar-collapsed') === '1')
   }, [])
 
   useEffect(() => {
@@ -138,16 +142,34 @@ export function AppShell({
     localStorage.setItem('next-forge-theme', nextDark ? 'dark' : 'light')
   }
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed((current) => {
+      const next = !current
+      localStorage.setItem('next-forge-sidebar-collapsed', next ? '1' : '0')
+      return next
+    })
+  }
+
   const copyCommand = async (command: string) => {
     await navigator.clipboard.writeText(command)
     setToast(t('Command copied to clipboard', 'تم نسخ الأمر'))
     setCommandOpen(false)
   }
 
-  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
+  const Sidebar = ({
+    mobile = false,
+    collapsed = false,
+  }: {
+    mobile?: boolean
+    collapsed?: boolean
+  }) => (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 px-3 py-3">
-        <div className="flex size-11 items-center justify-center rounded-[18px] bg-[#25002f] shadow-[0_12px_30px_rgba(79,16,89,.22)]">
+      <div
+        className={`flex items-center py-3 transition-all duration-300 ${
+          collapsed ? 'flex-col gap-2 px-1' : 'gap-3 px-2'
+        }`}
+      >
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-[18px] bg-[#25002f] shadow-[0_12px_30px_rgba(79,16,89,.22)]">
           {/* eslint-disable-next-line @next/next/no-img-element -- local UI brand mark; fixed dimensions and no optimization needed */}
           <img
             src="/next-forge-mark.png"
@@ -157,39 +179,78 @@ export function AppShell({
             className="size-9 object-contain"
           />
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-[-0.02em]">Next Forge</p>
-          <p className="truncate text-[11px] text-muted-foreground">{t('Engineering Console', 'لوحة الهندسة')}</p>
-        </div>
+
+        {!collapsed ? (
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold tracking-[-0.02em]">Next Forge</p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              {t('Engineering Console', 'لوحة الهندسة')}
+            </p>
+          </div>
+        ) : null}
+
+        {!mobile ? (
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-pressed={collapsed}
+            aria-label={t(
+              collapsed ? 'Expand sidebar' : 'Collapse sidebar',
+              collapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي'
+            )}
+            title={t(
+              collapsed ? 'Expand sidebar' : 'Collapse sidebar',
+              collapsed ? 'توسيع الشريط الجانبي' : 'طي الشريط الجانبي'
+            )}
+            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary active:scale-95"
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="size-3.5 rtl:scale-x-[-1]" />
+            ) : (
+              <PanelLeftClose className="size-3.5 rtl:scale-x-[-1]" />
+            )}
+          </button>
+        ) : null}
       </div>
 
       <div className="my-4 h-px bg-border" />
 
-      <nav className="flex-1 space-y-6 overflow-y-auto pb-6">
+      <nav className="flex-1 space-y-6 overflow-y-auto overflow-x-hidden pb-6">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              {t(group.label, group.labelAr)}
-            </p>
+            {!collapsed ? (
+              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
+                {t(group.label, group.labelAr)}
+              </p>
+            ) : (
+              <div className="mx-auto mb-2 h-px w-7 bg-border" />
+            )}
             <div className="space-y-1">
               {group.items.map((item) => {
                 const Icon = item.icon
                 const active =
                   item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+                const label = t(item.label, item.labelAr)
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
+                    title={collapsed ? label : undefined}
+                    aria-label={collapsed ? label : undefined}
                     onClick={() => mobile && setMobileOpen(false)}
-                    className={`group flex min-h-10 items-center gap-3 rounded-[14px] px-3 text-sm transition-all duration-200 ${
+                    className={`group flex min-h-10 items-center rounded-[14px] text-sm transition-all duration-200 ${
+                      collapsed ? 'justify-center px-0' : 'gap-3 px-3'
+                    } ${
                       active
                         ? 'bg-primary/10 font-medium text-primary shadow-[inset_0_0_0_1px_rgba(173,120,176,.08)]'
                         : 'text-muted-foreground hover:bg-primary/[0.055] hover:text-foreground'
                     }`}
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} />
-                    <span className="flex-1 truncate">{t(item.label, item.labelAr)}</span>
-                    {active ? <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" /> : null}
+                    {!collapsed ? <span className="flex-1 truncate">{label}</span> : null}
+                    {active && !collapsed ? (
+                      <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" />
+                    ) : null}
                   </Link>
                 )
               })}
@@ -201,12 +262,22 @@ export function AppShell({
       <div className="border-t border-border pt-4">
         <Link
           href="/repository"
+          title={collapsed ? t('Repository explorer', 'مستكشف المستودع') : undefined}
+          aria-label={collapsed ? t('Repository explorer', 'مستكشف المستودع') : undefined}
           onClick={() => mobile && setMobileOpen(false)}
-          className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground"
+          className={`flex items-center rounded-[14px] py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground ${
+            collapsed ? 'justify-center px-0' : 'gap-3 px-3'
+          }`}
         >
-          <GitBranch className="size-[17px]" strokeWidth={1.8} />
-          <span className="flex-1">{t('Repository explorer', 'مستكشف المستودع')}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px]">canary</span>
+          <GitBranch className="size-[17px] shrink-0" strokeWidth={1.8} />
+          {!collapsed ? (
+            <>
+              <span className="flex-1">{t('Repository explorer', 'مستكشف المستودع')}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px]">
+                canary
+              </span>
+            </>
+          ) : null}
         </Link>
       </div>
     </div>
@@ -214,8 +285,12 @@ export function AppShell({
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block rtl:left-auto rtl:right-4">
-        <Sidebar />
+      <aside
+        className={`fixed inset-y-4 left-4 z-30 hidden rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl transition-[width] duration-300 lg:block rtl:left-auto rtl:right-4 ${
+          sidebarCollapsed ? 'w-[76px]' : 'w-[252px]'
+        }`}
+      >
+        <Sidebar collapsed={sidebarCollapsed} />
       </aside>
 
       {mobileOpen ? (
@@ -240,7 +315,13 @@ export function AppShell({
         </div>
       ) : null}
 
-      <main className="min-w-0 lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]">
+      <main
+        className={`min-w-0 transition-[padding] duration-300 ${
+          sidebarCollapsed
+            ? 'lg:pl-[108px] rtl:lg:pl-0 rtl:lg:pr-[108px]'
+            : 'lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]'
+        }`}
+      >
         <div className="mx-auto w-full max-w-[1720px] px-4 pb-12 pt-4 sm:px-6 lg:px-7">
           <header className="nf-glass sticky top-4 z-20 mb-6 flex min-h-16 items-center gap-3 rounded-[22px] px-3.5 sm:px-4">
             <button
