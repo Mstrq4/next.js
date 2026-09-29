@@ -29,8 +29,8 @@ type Shell = 'bash' | 'powershell'
 function targetPath(target: InstallTarget, shell: Shell) {
   if (target === 'shared') return '.agents/skills'
   if (target === 'claude') return '.claude/skills'
-  if (target === 'codex') return shell === 'powershell' ? '$HOME\.codex\skills' : '$HOME/.codex/skills'
-  return shell === 'powershell' ? '$HOME\.hermes\skills\nextjs' : '$HOME/.hermes/skills/nextjs'
+  if (target === 'codex') return shell === 'powershell' ? '$HOME\\.codex\\skills' : '$HOME/.codex/skills'
+  return shell === 'powershell' ? '$HOME\\.hermes\\skills\\nextjs' : '$HOME/.hermes/skills/nextjs'
 }
 
 function bashInstall(items: SkillCatalogItem[], target: InstallTarget) {

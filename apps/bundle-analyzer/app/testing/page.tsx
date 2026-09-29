@@ -40,7 +40,7 @@ export default async function TestingPage() {
         </GlassCard>
       </div>
 
-      <TestingLabClient availableTests={data.tests} />
+      <div className="mb-6"><LiveSmokeChecks /></div>\n\n      <TestingLabClient availableTests={data.tests} />
     </AppShell>
   )
 }
