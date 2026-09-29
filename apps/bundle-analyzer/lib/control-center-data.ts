@@ -325,6 +325,7 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'يتعرف Hermes على .agents/skills داخل المشروع ويمكنه كذلك فحص مجلدات مهارات مشتركة خارجية.',
       paths: ['.agents/skills', 'AGENTS.md'],
       commands: [
+        { label: 'Trust repository-local Agent Skills', command: 'hermes skills trust' },
         { label: 'Start Hermes in the repository', command: 'hermes chat' },
         { label: 'List available Hermes skills', command: 'hermes skills list' },
         { label: 'Install project skills into Hermes', command: 'mkdir -p ~/.hermes/skills/nextjs && cp -R .agents/skills/* ~/.hermes/skills/nextjs/' },
