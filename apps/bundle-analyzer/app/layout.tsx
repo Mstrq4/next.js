@@ -5,6 +5,7 @@ import { SplashScreen } from '@/components/control-center/splash-screen'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://next-js-bundle-analyzer-umber.vercel.app'),
   applicationName: 'Next Forge',
   title: {
     default: 'Next Forge',
@@ -12,6 +13,36 @@ export const metadata: Metadata = {
   },
   description:
     'A bilingual engineering control center and documentation hub for the Next.js repository, agents, skills, packages, tests, workflows and build toolchains.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    url: '/',
+    title: 'Next Forge',
+    description:
+      'Engineering intelligence, skills, agents, repository analysis and operational documentation for Next.js.',
+    siteName: 'Next Forge',
+    images: [
+      {
+        url: '/next-forge-mark.png',
+        width: 128,
+        height: 128,
+        alt: 'Next Forge',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Next Forge',
+    description:
+      'Engineering intelligence, skills, agents, repository analysis and operational documentation for Next.js.',
+    images: ['/next-forge-mark.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   manifest: '/manifest.webmanifest',
   icons: {
     icon: '/favicon.svg',
