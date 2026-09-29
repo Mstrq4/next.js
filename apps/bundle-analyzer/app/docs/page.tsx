@@ -108,6 +108,106 @@ const sections = [
   },
 ]
 
+
+const directoryGuide = [
+  {
+    path: '.agents/skills',
+    title: 'Shared Agent Skills',
+    titleAr: 'مهارات الوكلاء المشتركة',
+    description: 'Cross-tool skill definitions used by coding agents to understand repository workflows.',
+    descriptionAr: 'تعريفات مهارات مشتركة بين أدوات الوكلاء لفهم سير العمل داخل المستودع.',
+    command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print',
+  },
+  {
+    path: '.cargo',
+    title: 'Rust / Cargo configuration',
+    titleAr: 'إعدادات Rust وCargo',
+    description: 'Cargo configuration used by native Rust crates and compiler tooling.',
+    descriptionAr: 'إعدادات Cargo المستخدمة مع حزم Rust الأصلية وأدوات المترجم.',
+    command: 'find .cargo -maxdepth 2 -type f -print',
+  },
+  {
+    path: '.claude-plugin',
+    title: 'Claude plugin metadata',
+    titleAr: 'بيانات إضافة Claude',
+    description: 'Plugin metadata that makes repository capabilities discoverable to Claude Code.',
+    descriptionAr: 'بيانات الإضافة التي تجعل قدرات المستودع قابلة للاكتشاف من Claude Code.',
+    command: 'find .claude-plugin -maxdepth 3 -type f -print',
+  },
+  {
+    path: '.claude',
+    title: 'Claude Code workspace',
+    titleAr: 'مساحة Claude Code',
+    description: 'Claude Code project configuration, skill bridges and repository-local instructions.',
+    descriptionAr: 'إعدادات Claude Code داخل المشروع وجسور المهارات والتعليمات المحلية.',
+    command: 'find .claude -maxdepth 3 -type f -print',
+  },
+  {
+    path: '.conductor',
+    title: 'Parallel agent worktrees',
+    titleAr: 'مساحات عمل الوكلاء المتوازية',
+    description: 'Conductor setup for isolated worktrees and parallel Claude Code execution.',
+    descriptionAr: 'إعداد Conductor لإنشاء worktrees معزولة وتشغيل Claude Code بالتوازي.',
+    command: 'cat .conductor/README.md',
+  },
+  {
+    path: '.config',
+    title: 'Repository configuration',
+    titleAr: 'إعدادات المستودع',
+    description: 'Project-specific configuration files consumed by development and automation tooling.',
+    descriptionAr: 'ملفات إعداد خاصة بالمشروع تستخدمها أدوات التطوير والأتمتة.',
+    command: 'find .config -maxdepth 2 -type f -print',
+  },
+  {
+    path: '.cursor',
+    title: 'Cursor workflows',
+    titleAr: 'سير عمل Cursor',
+    description: 'Cursor commands and repository workflows, including Graphite-oriented development guidance.',
+    descriptionAr: 'أوامر Cursor وسير عمل المستودع بما في ذلك تعليمات التطوير المرتبطة بـGraphite.',
+    command: 'find .cursor -maxdepth 3 -type f -print',
+  },
+  {
+    path: '.devcontainer',
+    title: 'Development container',
+    titleAr: 'حاوية التطوير',
+    description: 'Dev Container configuration for reproducible editor and container environments.',
+    descriptionAr: 'إعداد Dev Container للحصول على بيئة محرر وحاوية قابلة للتكرار.',
+    command: 'find .devcontainer -maxdepth 2 -type f -print',
+  },
+  {
+    path: '.github',
+    title: 'GitHub automation & policy',
+    titleAr: 'أتمتة وسياسات GitHub',
+    description: 'Actions workflows, issue/PR configuration and repository policy such as CLAUDE.md.',
+    descriptionAr: 'سير عمل Actions وإعدادات القضايا وطلبات الدمج وسياسات المستودع مثل CLAUDE.md.',
+    command: 'find .github/workflows -maxdepth 1 -type f -print',
+  },
+  {
+    path: '.husky',
+    title: 'Git hooks',
+    titleAr: 'خطافات Git',
+    description: 'Repository Git hooks used to enforce local checks around commits and pushes.',
+    descriptionAr: 'خطافات Git المستخدمة لفرض فحوصات محلية حول عمليات commit وpush.',
+    command: 'find .husky -maxdepth 2 -type f -print',
+  },
+  {
+    path: '.vscode',
+    title: 'VS Code workspace',
+    titleAr: 'مساحة VS Code',
+    description: 'Editor settings, tasks and recommendations for contributors using VS Code.',
+    descriptionAr: 'إعدادات المحرر والمهام والتوصيات للمساهمين الذين يستخدمون VS Code.',
+    command: 'find .vscode -maxdepth 2 -type f -print',
+  },
+  {
+    path: 'skills',
+    title: 'Next.js framework skills',
+    titleAr: 'مهارات إطار Next.js',
+    description: 'Framework-specific skills for Cache Components, development loops and partial prefetching.',
+    descriptionAr: 'مهارات مخصصة للإطار تشمل Cache Components ودورة التطوير وPartial Prefetching.',
+    command: 'find skills -maxdepth 2 -name SKILL.md -print',
+  },
+]
+
 export default function DocumentationPage() {
   return (
     <AppShell
@@ -147,9 +247,9 @@ export default function DocumentationPage() {
           return (
             <section key={section.title}>
               <SectionHeading
-                eyebrow="Runbook"
-                title={section.title}
-                description={section.description}
+                eyebrow={<Localized en="Runbook" ar="دليل التشغيل" />}
+                title={<Localized en={section.title} ar={section.titleAr} />}
+                description={<Localized en={section.description} ar={section.descriptionAr} />}
               />
               <div className="grid gap-3 lg:grid-cols-[.7fr_1.3fr]">
                 <GlassCard className="p-5">
@@ -180,34 +280,25 @@ export default function DocumentationPage() {
         })}
       </div>
 
-      <GlassCard className="mt-10 p-6">
-        <Localized
-          as="h2"
-          en="Agent and tooling directories documented by this console"
-          ar="مجلدات الوكلاء والأدوات التي يوثقها هذا النظام"
-          className="text-xl font-semibold tracking-[-0.025em]"
+      <section className="mt-10">
+        <SectionHeading
+          eyebrow={<Localized en="Repository map" ar="خريطة المستودع" />}
+          title={<Localized en="Agent and tooling directories" ar="مجلدات الوكلاء والأدوات" />}
+          description={<Localized en="These are the configuration surfaces visible in the repository tree you provided. Each entry explains what it is for and gives a command to inspect it directly." ar="هذه هي أسطح الإعداد الظاهرة في شجرة المستودع التي أرسلتها. يوضح كل عنصر وظيفته ويعطي أمرًا لفحصه مباشرة." />}
         />
-        <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            '.agents/skills',
-            '.cargo',
-            '.claude-plugin',
-            '.claude',
-            '.conductor',
-            '.config',
-            '.cursor',
-            '.devcontainer',
-            '.github',
-            '.husky',
-            '.vscode',
-            'skills',
-          ].map((path) => (
-            <div key={path} className="rounded-[14px] bg-muted/65 px-3 py-2.5 font-mono text-xs text-muted-foreground">
-              {path}
-            </div>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {directoryGuide.map((item) => (
+            <GlassCard key={item.path} className="p-5">
+              <p className="font-mono text-xs font-semibold text-primary">{item.path}</p>
+              <Localized as="h3" en={item.title} ar={item.titleAr} className="mt-3 font-semibold" />
+              <Localized as="p" en={item.description} ar={item.descriptionAr} className="mt-2 min-h-16 text-sm leading-6 text-muted-foreground" />
+              <div className="mt-4">
+                <CommandBlock command={item.command} />
+              </div>
+            </GlassCard>
           ))}
         </div>
-      </GlassCard>
+      </section>
     </AppShell>
   )
 }

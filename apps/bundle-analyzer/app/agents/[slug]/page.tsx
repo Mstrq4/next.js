@@ -51,22 +51,22 @@ export default async function AgentDetailPage({
       <div className="grid gap-4 xl:grid-cols-[.9fr_1.1fr]">
         <GlassCard className="p-5 sm:p-6">
           <SectionHeading
-            eyebrow="Setup"
-            title="Launch and inspect"
-            description="Use the repository-local configuration and commands below from the Next.js checkout."
+            eyebrow={<Localized en="Setup" ar="الإعداد" />}
+            title={<Localized en="Launch and inspect" ar="التشغيل والفحص" />}
+            description={<Localized en="Use the repository-local configuration and commands below from the Next.js checkout." ar="استخدم إعدادات المستودع المحلية والأوامر التالية من داخل نسخة Next.js." />}
           />
           <div className="space-y-3">
             {agent.commands.map((item) => (
-              <CommandBlock key={item.command} title={item.label} command={item.command} />
+              <CommandBlock key={item.command} title={item.labelAr ?? item.label} command={item.command} />
             ))}
           </div>
         </GlassCard>
 
         <GlassCard className="p-5 sm:p-6">
           <SectionHeading
-            eyebrow="Files"
-            title="Integration surface"
-            description="Open the exact repository files used by this integration or download them together."
+            eyebrow={<Localized en="Files" ar="الملفات" />}
+            title={<Localized en="Integration surface" ar="سطح التكامل" />}
+            description={<Localized en="Open the exact repository files used by this integration or download them together." ar="افتح ملفات المستودع الفعلية المستخدمة في هذا التكامل أو نزّلها معًا." />}
           />
           <div className="max-h-[62vh] space-y-1 overflow-y-auto">
             {agent.files.map((file) => (

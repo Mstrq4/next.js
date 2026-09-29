@@ -127,6 +127,7 @@ export function AppShell({
     return commands.filter(
       (item) =>
         item.label.toLowerCase().includes(needle) ||
+        item.labelAr.toLowerCase().includes(needle) ||
         item.command.toLowerCase().includes(needle)
     )
   }, [query])
