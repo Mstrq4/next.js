@@ -47,6 +47,15 @@ export default async function InsightsPage() {
     1
   )
 
+  const summaryCards = [
+    { value: snapshot.packages.length, en: 'Packages', ar: 'الحزم', icon: PackageOpen },
+    { value: totalSkills, en: 'Skills', ar: 'المهارات', icon: Braces },
+    { value: agents.length, en: 'Agent integrations', ar: 'تكاملات الوكلاء', icon: Boxes },
+    { value: snapshot.tests.length, en: 'Test entry points', ar: 'نقاط الاختبار', icon: TestTube2 },
+    { value: snapshot.workflows.length, en: 'Workflows', ar: 'سير العمل', icon: Workflow },
+    { value: snapshot.turbopackCrates.length, en: 'Turbopack crates', ar: 'حزم Turbopack', icon: Zap },
+  ]
+
   const surfaceRows = [
     {
       label: 'Workspace packages',
@@ -90,20 +99,16 @@ export default async function InsightsPage() {
       eyebrowAr="التحليلات الهندسية"
     >
       <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        {[
-          [snapshot.packages.length, 'Packages', 'الحزم', PackageOpen],
-          [totalSkills, 'Skills', 'المهارات', Braces],
-          [agents.length, 'Agent integrations', 'تكاملات الوكلاء', Boxes],
-          [snapshot.tests.length, 'Test entry points', 'نقاط الاختبار', TestTube2],
-          [snapshot.workflows.length, 'Workflows', 'سير العمل', Workflow],
-          [snapshot.turbopackCrates.length, 'Turbopack crates', 'حزم Turbopack', Zap],
-        ].map(([value, en, ar, Icon]) => (
-          <GlassCard key={String(en)} className="p-4 sm:p-5">
-            <Icon className="size-4 text-primary" />
-            <p className="mt-5 text-2xl font-semibold tracking-[-0.04em]">{String(value)}</p>
-            <Localized as="p" en={String(en)} ar={String(ar)} className="mt-1 text-xs text-muted-foreground" />
-          </GlassCard>
-        ))}
+        {summaryCards.map((item) => {
+          const Icon = item.icon
+          return (
+            <GlassCard key={item.en} className="p-4 sm:p-5">
+              <Icon className="size-4 text-primary" />
+              <p className="mt-5 text-2xl font-semibold tracking-[-0.04em]">{item.value}</p>
+              <Localized as="p" en={item.en} ar={item.ar} className="mt-1 text-xs text-muted-foreground" />
+            </GlassCard>
+          )
+        })}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.05fr_.95fr]">
