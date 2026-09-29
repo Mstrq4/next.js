@@ -3,6 +3,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import {
   Activity,
+  BarChart3,
   BookOpen,
   Boxes,
   Braces,
@@ -55,6 +56,7 @@ const navGroups = [
       { href: '/toolchain', label: 'Toolchain', labelAr: 'سلسلة الأدوات', icon: Wrench },
       { href: '/testing', label: 'Testing', labelAr: 'الاختبارات', icon: TestTube2 },
       { href: '/workflows', label: 'Workflows', labelAr: 'سير العمل', icon: Workflow },
+      { href: '/insights', label: 'Insights', labelAr: 'التحليلات', icon: BarChart3 },
       { href: '/docs', label: 'Documentation', labelAr: 'التوثيق', icon: BookOpen },
     ],
   },
@@ -113,6 +115,14 @@ export function AppShell({
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
         setCommandOpen(true)
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'b') {
+        event.preventDefault()
+        setSidebarCollapsed((current) => {
+          const next = !current
+          localStorage.setItem('next-forge-sidebar', next ? 'collapsed' : 'expanded')
+          return next
+        })
       }
     }
     window.addEventListener('keydown', onKey)
@@ -246,7 +256,12 @@ export function AppShell({
             title={compact ? t('Expand sidebar', 'توسيع الشريط الجانبي') : t('Collapse sidebar', 'طي الشريط الجانبي')}
           >
             {compact ? <PanelLeftOpen className="size-[17px]" /> : <PanelLeftClose className="size-[17px]" />}
-            {!compact ? <span>{t('Collapse sidebar', 'طي الشريط الجانبي')}</span> : null}
+            {!compact ? (
+              <>
+                <span className="flex-1 text-start">{t('Collapse sidebar', 'طي الشريط الجانبي')}</span>
+                <kbd className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[9px]">⌘B</kbd>
+              </>
+            ) : null}
           </button>
         ) : null}
       </div>
