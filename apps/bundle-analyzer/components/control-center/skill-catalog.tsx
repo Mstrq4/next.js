@@ -7,17 +7,51 @@ import {
   FolderCode,
   Search,
   Sparkles,
+  TerminalSquare,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { SkillCatalogItem } from '@/lib/control-center-data'
+import { CommandBlock } from './copy-button'
 import { ZipDownloadButton } from './zip-download-button'
 import { useI18n } from './i18n-provider'
+import { GlassCard, Pill } from './ui'
 
 type Bundle = {
   name: string
   skills: SkillCatalogItem[]
   files: Array<{ path: string; url: string }>
+}
+
+type InstallTarget = 'shared' | 'claude' | 'codex' | 'hermes'
+type Shell = 'bash' | 'powershell'
+
+function targetPath(target: InstallTarget, shell: Shell) {
+  if (target === 'shared') return '.agents/skills'
+  if (target === 'claude') return '.claude/skills'
+  if (target === 'codex') return shell === 'powershell' ? '$HOME\.codex\skills' : '$HOME/.codex/skills'
+  return shell === 'powershell' ? '$HOME\.hermes\skills\nextjs' : '$HOME/.hermes/skills/nextjs'
+}
+
+function bashInstall(items: SkillCatalogItem[], target: InstallTarget) {
+  const paths = items.map((item) => `'${item.path}'`).join(' ')
+  const destination = targetPath(target, 'bash')
+  const copies = items
+    .map((item) => `cp -R "$tmp/next.js/${item.path}" "${destination}/${item.slug}"`)
+    .join(' && ')
+  return `tmp="$(mktemp -d)" && git clone --depth 1 --filter=blob:none --sparse https://github.com/vercel/next.js.git "$tmp/next.js" && git -C "$tmp/next.js" sparse-checkout set ${paths} && mkdir -p "${destination}" && ${copies} && rm -rf "$tmp"`
+}
+
+function powershellInstall(items: SkillCatalogItem[], target: InstallTarget) {
+  const paths = items.map((item) => `"${item.path}"`).join(' ')
+  const destination = targetPath(target, 'powershell')
+  const copies = items
+    .map(
+      (item) =>
+        `Copy-Item -Recurse -Force (Join-Path $src "${item.path}") (Join-Path "${destination}" "${item.slug}")`
+    )
+    .join('; ')
+  return `$src = Join-Path $env:TEMP ("nextjs-skills-" + [guid]::NewGuid()); git clone --depth 1 --filter=blob:none --sparse https://github.com/vercel/next.js.git $src; git -C $src sparse-checkout set ${paths}; New-Item -ItemType Directory -Force -Path "${destination}" | Out-Null; ${copies}; Remove-Item -Recurse -Force $src`
 }
 
 export function SkillCatalog({
@@ -30,6 +64,8 @@ export function SkillCatalog({
   const { t } = useI18n()
   const [query, setQuery] = useState('')
   const [bundle, setBundle] = useState('All')
+  const [target, setTarget] = useState<InstallTarget>('shared')
+  const [shell, setShell] = useState<Shell>('bash')
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -44,7 +80,22 @@ export function SkillCatalog({
     })
   }, [skills, query, bundle])
 
+  const installItems =
+    bundle === 'All'
+      ? skills
+      : bundles.find((item) => item.name === bundle)?.skills ?? filtered
+  const installCommand =
+    shell === 'bash'
+      ? bashInstall(installItems, target)
+      : powershellInstall(installItems, target)
   const allFiles = skills.flatMap((skill) => skill.files)
+
+  const targetLabels: Array<{ id: InstallTarget; en: string; ar: string }> = [
+    { id: 'shared', en: 'Project / Cursor shared', ar: 'المشروع / Cursor مشترك' },
+    { id: 'claude', en: 'Claude Code project', ar: 'مشروع Claude Code' },
+    { id: 'codex', en: 'Codex user skills', ar: 'مهارات Codex للمستخدم' },
+    { id: 'hermes', en: 'Hermes user skills', ar: 'مهارات Hermes للمستخدم' },
+  ]
 
   return (
     <>
@@ -93,21 +144,80 @@ export function SkillCatalog({
         ))}
       </div>
 
-      {bundle !== 'All' ? (
-        <div className="mb-5 flex items-center justify-between gap-4 rounded-[20px] border border-border bg-primary/[0.045] p-4">
-          <div>
-            <p className="text-sm font-semibold">{bundle}</p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              {t('Download this complete skill bundle as one ZIP archive.', 'نزّل حزمة المهارات كاملة في ملف ZIP واحد.')}
+      <GlassCard className="mb-7 p-5 sm:p-6">
+        <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+          <div className="max-w-2xl">
+            <div className="flex items-center gap-2">
+              <TerminalSquare className="size-4 text-primary" />
+              <h2 className="font-semibold">{t('Install selected skill scope', 'تثبيت نطاق المهارات المحدد')}</h2>
+              <Pill tone="violet">{bundle === 'All' ? t('All skills', 'كل المهارات') : bundle}</Pill>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t(
+                'Choose an agent target and shell. The command sparse-checks out only the required skill folders from the official Vercel repository, copies them to the target skill directory, then removes the temporary checkout.',
+                'اختر الوكيل ونوع الطرفية. يقوم الأمر بجلب مجلدات المهارات المطلوبة فقط من مستودع Vercel الرسمي ثم ينسخها إلى مجلد مهارات الوكيل ويحذف النسخة المؤقتة.'
+              )}
             </p>
           </div>
-          <ZipDownloadButton
-            files={bundles.find((item) => item.name === bundle)?.files ?? []}
-            filename={'nextjs-' + bundle.toLowerCase().replaceAll(' ', '-') + '-skills.zip'}
-            compact
+          {bundle !== 'All' ? (
+            <ZipDownloadButton
+              files={bundles.find((item) => item.name === bundle)?.files ?? []}
+              filename={'nextjs-' + bundle.toLowerCase().replaceAll(' ', '-') + '-skills.zip'}
+              label={t('Download this bundle', 'تنزيل هذه الحزمة')}
+            />
+          ) : null}
+        </div>
+
+        <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_auto]">
+          <div className="flex flex-wrap gap-2">
+            {targetLabels.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setTarget(item.id)}
+                className={`rounded-full px-3 py-2 text-xs font-medium transition-colors ${
+                  target === item.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {t(item.en, item.ar)}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-2">
+            {(['bash', 'powershell'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setShell(value)}
+                className={`rounded-full px-3 py-2 font-mono text-[11px] transition-colors ${
+                  shell === value
+                    ? 'bg-primary/10 text-primary'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {value === 'bash' ? 'Bash' : 'PowerShell'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <CommandBlock
+            title={t(
+              `Install ${installItems.length} skill(s)`,
+              `تثبيت ${installItems.length} مهارة`
+            )}
+            command={installCommand}
           />
         </div>
-      ) : null}
+
+        <div className="mt-4 grid gap-2 md:grid-cols-2">
+          <CommandBlock title="Claude Code marketplace" command="/plugin marketplace add vercel/next.js" />
+          <CommandBlock title="Claude Code Next.js plugin" command="/plugin install nextjs@nextjs" />
+        </div>
+      </GlassCard>
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {filtered.map((skill) => (
@@ -139,11 +249,7 @@ export function SkillCatalog({
                   <BookOpen className="size-3.5" />
                   {t('View skill', 'عرض المهارة')}
                 </Link>
-                <ZipDownloadButton
-                  files={skill.files}
-                  filename={skill.slug + '.zip'}
-                  compact
-                />
+                <ZipDownloadButton files={skill.files} filename={skill.slug + '.zip'} compact />
               </div>
             </div>
           </article>
