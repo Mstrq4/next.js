@@ -8,6 +8,7 @@ import {
   TestTube2,
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { TestCommandBuilder } from '@/components/control-center/test-command-builder'
 import { CopyButton, CommandBlock } from '@/components/control-center/copy-button'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getRepoSnapshot } from '@/lib/control-center-data'
@@ -54,6 +55,7 @@ export default async function TestingPage() {
       eyebrow="Quality engineering"
       eyebrowAr="هندسة الجودة"
     >
+      <TestCommandBuilder />
       <div className="mb-6 grid gap-3 lg:grid-cols-2">
         <CommandBlock title="Generate a new test" command="pnpm new-test --args true my-feature e2e" />
         <CommandBlock title="Fast unit verification" command="pnpm test-unit" />

@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/control-center/app-shell'
 import { SkillCatalog } from '@/components/control-center/skill-catalog'
+import { SkillInstallMatrix } from '@/components/control-center/skill-install-matrix'
 import { GlassCard } from '@/components/control-center/ui'
 import { getSkillBundles, getSkillCatalog } from '@/lib/control-center-data'
 
@@ -36,6 +37,13 @@ export default async function SkillsPage() {
         </GlassCard>
       </div>
 
+      <SkillInstallMatrix
+        skills={skills.map(({ slug, path, bundle, name }) => ({ slug, path, bundle, name }))}
+        bundles={bundles.map((item) => ({
+          name: item.name,
+          skills: item.skills.map(({ slug, path, bundle, name }) => ({ slug, path, bundle, name })),
+        }))}
+      />
       <SkillCatalog skills={skills} bundles={bundles} />
     </AppShell>
   )

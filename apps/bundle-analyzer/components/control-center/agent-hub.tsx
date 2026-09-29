@@ -9,7 +9,9 @@ import {
   FolderCode,
   Network,
   TerminalSquare,
+  ArrowUpRight,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import type { AgentIntegration } from '@/lib/control-center-data'
 import { CommandBlock } from './copy-button'
@@ -91,7 +93,11 @@ export function AgentHub({ agents }: { agents: AgentIntegration[] }) {
                       </p>
                       <div className="space-y-2">
                         {agent.commands.map((item) => (
-                          <CommandBlock key={item.command} title={item.label} command={item.command} />
+                          <CommandBlock
+                            key={item.command}
+                            title={t(item.label, item.labelAr ?? item.label)}
+                            command={item.command}
+                          />
                         ))}
                       </div>
                     </div>
@@ -118,6 +124,13 @@ export function AgentHub({ agents }: { agents: AgentIntegration[] }) {
                           </div>
                         ))}
                       </div>
+                      <Link
+                        href={'/agents/' + agent.slug}
+                        className="mt-4 inline-flex min-h-9 items-center gap-2 rounded-full bg-primary px-3 text-xs font-medium text-primary-foreground"
+                      >
+                        {t('View agent integration', 'عرض تكامل الوكيل')}
+                        <ArrowUpRight className="size-3.5" />
+                      </Link>
                     </div>
                   </div>
                 </div>
