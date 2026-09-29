@@ -9,7 +9,9 @@ import {
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
 import { CopyButton } from '@/components/control-center/copy-button'
-import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
+import { Localized } from '@/components/control-center/i18n-provider'
+import { LiveActionsStatus } from '@/components/control-center/live-actions-status'
+import { GlassCard, Pill } from '@/components/control-center/ui'
 import { getWorkflowCatalog } from '@/lib/control-center-data'
 
 const categoryIcon = {
@@ -19,6 +21,14 @@ const categoryIcon = {
   Turbopack: Zap,
   Automation: Workflow,
 } as const
+
+const categoryAr: Record<string, string> = {
+  CI: 'تكامل مستمر',
+  Release: 'إصدار',
+  Rspack: 'Rspack',
+  Turbopack: 'Turbopack',
+  Automation: 'أتمتة',
+}
 
 export default async function WorkflowsPage() {
   const workflows = await getWorkflowCatalog()
@@ -31,31 +41,31 @@ export default async function WorkflowsPage() {
     <AppShell
       title="GitHub automation"
       titleAr="أتمتة GitHub"
-      subtitle="Inspect every workflow, open its live Actions page and copy the GitHub CLI command used to dispatch it when your account has permission."
-      subtitleAr="افحص كل سير عمل وافتح صفحة Actions الفعلية وانسخ أمر GitHub CLI لتشغيله عندما يملك حسابك الصلاحية."
+      subtitle="Inspect real workflow definitions, follow current public Actions runs and copy GitHub CLI commands for authorized dispatch."
+      subtitleAr="افحص تعريفات سير العمل الحقيقية، وتابع تشغيلات Actions العامة الحالية، وانسخ أوامر GitHub CLI للتشغيل عندما تتوفر الصلاحية."
       eyebrow="CI & automation"
       eyebrowAr="التكامل المستمر والأتمتة"
     >
+      <LiveActionsStatus />
+
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {['CI', 'Release', 'Rspack', 'Turbopack', 'Automation'].map((category) => {
           const Icon = categoryIcon[category as keyof typeof categoryIcon]
           return (
             <GlassCard key={category} className="p-4">
               <Icon className="size-4 text-primary" />
-              <p className="mt-4 text-2xl font-semibold tracking-[-0.04em]">
-                {counts[category] ?? 0}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">{category}</p>
+              <p className="mt-4 text-2xl font-semibold tracking-[-0.04em]">{counts[category] ?? 0}</p>
+              <Localized as="p" en={category} ar={categoryAr[category] ?? category} className="mt-1 text-xs text-muted-foreground" />
             </GlassCard>
           )
         })}
       </div>
 
-      <SectionHeading
-        eyebrow=".github/workflows"
-        title="Workflow catalog"
-        description="Every card maps to an existing workflow definition on the canary branch."
-      />
+      <div className="mb-5">
+        <Localized as="p" en=".github/workflows · Workflow catalog" ar=".github/workflows · كتالوج سير العمل" className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary/70" />
+        <Localized as="h2" en="Every card maps to a real workflow on canary." ar="كل بطاقة مرتبطة بسير عمل حقيقي على فرع canary." className="mt-1 text-xl font-semibold" />
+      </div>
+
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {workflows.map((workflow) => {
           const Icon = categoryIcon[workflow.category as keyof typeof categoryIcon] ?? Workflow
@@ -83,7 +93,7 @@ export default async function WorkflowsPage() {
                   className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-background/45 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <ExternalLink className="size-3.5" />
-                  Open workflow
+                  <Localized en="Open workflow" ar="فتح سير العمل" />
                 </a>
                 <CopyButton value={workflow.command} label="Copy run command" />
               </div>
