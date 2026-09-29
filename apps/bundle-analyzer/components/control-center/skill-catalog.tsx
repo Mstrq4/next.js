@@ -79,6 +79,7 @@ export function SkillCatalog({
         !needle ||
         skill.name.toLowerCase().includes(needle) ||
         skill.description.toLowerCase().includes(needle) ||
+        skill.descriptionAr.toLowerCase().includes(needle) ||
         skill.path.toLowerCase().includes(needle)
       return matchesBundle && matchesQuery
     })
