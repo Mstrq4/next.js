@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
 import { CopyButton } from '@/components/control-center/copy-button'
+import { Localized } from '@/components/control-center/i18n-provider'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getWorkflowCatalog } from '@/lib/control-center-data'
 
@@ -53,8 +54,8 @@ export default async function WorkflowsPage() {
 
       <SectionHeading
         eyebrow=".github/workflows"
-        title="Workflow catalog"
-        description="Every card maps to an existing workflow definition on the canary branch."
+        title={<Localized en="Workflow catalog" ar="كتالوج سير العمل" />}
+        description={<Localized en="Every card maps to an existing workflow definition on the canary branch." ar="كل بطاقة مرتبطة بملف سير عمل موجود فعليًا على فرع canary." />}
       />
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {workflows.map((workflow) => {
@@ -83,9 +84,9 @@ export default async function WorkflowsPage() {
                   className="inline-flex min-h-9 flex-1 items-center justify-center gap-2 rounded-full border border-border bg-background/45 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
                   <ExternalLink className="size-3.5" />
-                  Open workflow
+                  <Localized en="Open workflow" ar="فتح سير العمل" />
                 </a>
-                <CopyButton value={workflow.command} label="Copy run command" />
+                <CopyButton value={workflow.command} />
               </div>
             </GlassCard>
           )

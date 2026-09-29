@@ -10,6 +10,7 @@ import {
 import { AppShell } from '@/components/control-center/app-shell'
 import { TestCommandBuilder } from '@/components/control-center/test-command-builder'
 import { CopyButton, CommandBlock } from '@/components/control-center/copy-button'
+import { Localized } from '@/components/control-center/i18n-provider'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getRepoSnapshot } from '@/lib/control-center-data'
 
@@ -17,25 +18,33 @@ function groupTests(keys: string[]) {
   return [
     {
       name: 'Development',
+      nameAr: 'التطوير',
       description: 'Interactive dev-mode framework tests across bundlers.',
+      descriptionAr: 'اختبارات تفاعلية لوضع التطوير عبر الحوازم المختلفة.',
       keys: keys.filter((key) => key.includes('dev')),
       icon: PlayCircle,
     },
     {
       name: 'Production / start',
+      nameAr: 'الإنتاج / start',
       description: 'Production server and start-mode behavior.',
+      descriptionAr: 'سلوك خادم الإنتاج ووضع start.',
       keys: keys.filter((key) => key.includes('start')),
       icon: CheckCircle2,
     },
     {
       name: 'Turbopack',
+      nameAr: 'Turbopack',
       description: 'Tests explicitly exercising the Turbopack path.',
+      descriptionAr: 'اختبارات تستهدف مسار Turbopack مباشرة.',
       keys: keys.filter((key) => key.includes('turbo')),
       icon: Gauge,
     },
     {
       name: 'Rspack',
+      nameAr: 'Rspack',
       description: 'Alternative bundler integration and regression coverage.',
+      descriptionAr: 'تكامل الحازم البديل وتغطية الانحدارات.',
       keys: keys.filter((key) => key.includes('rspack')),
       icon: Activity,
     },
@@ -64,29 +73,29 @@ export default async function TestingPage() {
         <GlassCard className="p-5">
           <TestTube2 className="size-5 text-primary" />
           <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">{data.tests.length}</p>
-          <p className="mt-1 text-sm text-muted-foreground">root test commands</p>
+          <Localized as="p" en="root test commands" ar="أوامر الاختبار الجذرية" className="mt-1 text-sm text-muted-foreground" />
         </GlassCard>
         <GlassCard className="p-5">
           <FlaskConical className="size-5 text-primary" />
           <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Jest</p>
-          <p className="mt-1 text-sm text-muted-foreground">primary test runner</p>
+          <Localized as="p" en="primary test runner" ar="مشغل الاختبارات الأساسي" className="mt-1 text-sm text-muted-foreground" />
         </GlassCard>
         <GlassCard className="p-5">
           <Bug className="size-5 text-primary" />
           <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">Playwright</p>
-          <p className="mt-1 text-sm text-muted-foreground">browser verification</p>
+          <Localized as="p" en="browser verification" ar="التحقق عبر المتصفح" className="mt-1 text-sm text-muted-foreground" />
         </GlassCard>
         <GlassCard className="p-5">
           <Activity className="size-5 text-primary" />
           <p className="mt-5 text-3xl font-semibold tracking-[-0.04em]">3</p>
-          <p className="mt-1 text-sm text-muted-foreground">bundler paths</p>
+          <Localized as="p" en="bundler paths" ar="مسارات الحزم" className="mt-1 text-sm text-muted-foreground" />
         </GlassCard>
       </div>
 
       <SectionHeading
-        eyebrow="Test matrix"
-        title="Verification surfaces"
-        description="The same framework behavior is exercised through distinct development and bundler modes."
+        eyebrow={<Localized en="Test matrix" ar="مصفوفة الاختبار" />}
+        title={<Localized en="Verification surfaces" ar="أسطح التحقق" />}
+        description={<Localized en="The same framework behavior is exercised through distinct development and bundler modes." ar="يُختبر السلوك نفسه عبر أوضاع تطوير وحزم مختلفة." />}
       />
       <div className="grid gap-3 md:grid-cols-2">
         {groups.map((group) => {
@@ -99,12 +108,10 @@ export default async function TestingPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-semibold">{group.name}</h3>
+                    <Localized as="h3" en={group.name} ar={group.nameAr} className="font-semibold" />
                     <Pill>{group.keys.length} commands</Pill>
                   </div>
-                  <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                    {group.description}
-                  </p>
+                  <Localized as="p" en={group.description} ar={group.descriptionAr} className="mt-1 text-sm leading-6 text-muted-foreground" />
                 </div>
               </div>
               <div className="mt-5 space-y-2">

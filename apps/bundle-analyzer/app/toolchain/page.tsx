@@ -9,6 +9,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { Localized } from '@/components/control-center/i18n-provider'
 import { GlassCard, MetricBar, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getRepoSnapshot } from '@/lib/control-center-data'
 
@@ -20,6 +21,7 @@ export default async function ToolchainPage() {
       name: 'Next.js',
       value: 'workspace',
       detail: 'Framework core, router, server rendering and build pipeline.',
+      detailAr: 'نواة الإطار والتوجيه والتصيير على الخادم وخط البناء.',
       icon: Layers3,
       status: 'Core',
     },
@@ -27,6 +29,7 @@ export default async function ToolchainPage() {
       name: 'React',
       value: data.versions.react,
       detail: 'Canary React runtime synchronized into the framework workspace.',
+      detailAr: 'بيئة React canary المتزامنة داخل مساحة عمل الإطار.',
       icon: Braces,
       status: 'Runtime',
     },
@@ -34,6 +37,7 @@ export default async function ToolchainPage() {
       name: 'Turbopack',
       value: `${data.turbopackCrates.length} crates`,
       detail: 'Rust compiler and bundler surface used for fast development and builds.',
+      detailAr: 'سطح مترجم وحازم مبني على Rust للتطوير والبناء السريع.',
       icon: Zap,
       status: 'Native',
     },
@@ -41,6 +45,7 @@ export default async function ToolchainPage() {
       name: 'SWC',
       value: `${data.rustCrates.length} root crates`,
       detail: 'Native transforms, minification and framework-specific compiler work.',
+      detailAr: 'تحويلات أصلية وتصغير ومعالجة مترجم مخصصة للإطار.',
       icon: Cpu,
       status: 'Compiler',
     },
@@ -48,6 +53,7 @@ export default async function ToolchainPage() {
       name: 'Rspack',
       value: data.versions.rspack,
       detail: 'Alternative bundler integration with dedicated test and release paths.',
+      detailAr: 'تكامل حازم بديل مع مسارات اختبار وإصدار مخصصة.',
       icon: Boxes,
       status: 'Integration',
     },
@@ -55,6 +61,7 @@ export default async function ToolchainPage() {
       name: 'TypeScript',
       value: data.versions.typescript,
       detail: 'Repository type system for packages, tests and development tooling.',
+      detailAr: 'نظام الأنواع للحزم والاختبارات وأدوات التطوير داخل المستودع.',
       icon: CircuitBoard,
       status: 'Language',
     },
@@ -84,9 +91,7 @@ export default async function ToolchainPage() {
                 {layer.name}
               </h3>
               <p className="mt-1 font-mono text-xs text-primary/75">{layer.value}</p>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {layer.detail}
-              </p>
+              <Localized as="p" en={layer.detail} ar={layer.detailAr} className="mt-3 text-sm leading-6 text-muted-foreground" />
             </GlassCard>
           )
         })}
@@ -95,23 +100,23 @@ export default async function ToolchainPage() {
       <div className="mt-8 grid gap-4 xl:grid-cols-[1.1fr_.9fr]">
         <GlassCard className="p-5 sm:p-6">
           <SectionHeading
-            eyebrow="Native surface"
-            title="Rust workspace concentration"
-            description="The framework combines TypeScript orchestration with substantial native compiler infrastructure."
+            eyebrow={<Localized en="Native surface" ar="السطح الأصلي" />}
+            title={<Localized en="Rust workspace concentration" ar="تركيز مساحة عمل Rust" />}
+            description={<Localized en="The framework combines TypeScript orchestration with substantial native compiler infrastructure." ar="يجمع الإطار بين تنسيق TypeScript وبنية مترجم أصلية كبيرة." />}
           />
           <div className="space-y-5">
             <MetricBar
-              label="Turbopack crates"
+              label={<Localized en="Turbopack crates" ar="حزم Turbopack" />}
               value={String(data.turbopackCrates.length)}
               percent={100}
             />
             <MetricBar
-              label="Root native crates"
+              label={<Localized en="Root native crates" ar="حزم Rust الجذرية" />}
               value={String(data.rustCrates.length)}
               percent={42}
             />
             <MetricBar
-              label="JavaScript packages"
+              label={<Localized en="JavaScript packages" ar="حزم JavaScript" />}
               value={String(data.packages.length)}
               percent={64}
             />
@@ -120,14 +125,14 @@ export default async function ToolchainPage() {
 
         <GlassCard className="p-5 sm:p-6">
           <SectionHeading
-            eyebrow="Package manager"
-            title="Workspace foundation"
-            description="The repository is orchestrated as a pnpm + Turbo monorepo."
+            eyebrow={<Localized en="Package manager" ar="مدير الحزم" />}
+            title={<Localized en="Workspace foundation" ar="أساس مساحة العمل" />}
+            description={<Localized en="The repository is orchestrated as a pnpm + Turbo monorepo." ar="يُدار المستودع كـ monorepo باستخدام pnpm وTurbo." />}
           />
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-[18px] border border-border/70 bg-background/35 p-4">
               <PackageCheck className="size-4 text-primary" />
-              <p className="mt-4 text-xs text-muted-foreground">Package manager</p>
+              <Localized as="p" en="Package manager" ar="مدير الحزم" className="mt-4 text-xs text-muted-foreground" />
               <p className="mt-1 font-mono text-sm font-medium">{data.packageManager}</p>
             </div>
             <div className="rounded-[18px] border border-border/70 bg-background/35 p-4">
