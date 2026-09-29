@@ -14,8 +14,8 @@ export const metadata: Metadata = {
     'A bilingual engineering control center and documentation hub for the Next.js repository, agents, skills, packages, tests, workflows and build toolchains.',
   manifest: '/manifest.webmanifest',
   icons: {
-    icon: '/next-forge-mark.png',
-    shortcut: '/next-forge-mark.png',
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
     apple: '/next-forge-mark.png',
   },
   appleWebApp: {
