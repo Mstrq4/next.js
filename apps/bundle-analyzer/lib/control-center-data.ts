@@ -291,7 +291,31 @@ export type AgentIntegration = {
   descriptionAr: string
   paths: string[]
   files: Array<{ path: string; url: string }>
-  commands: Array<{ label: string; command: string }>
+  commands: Array<{ label: string; labelAr?: string; command: string }>
+}
+
+const agentCommandLabelsAr: Record<string, string> = {
+  'Start Claude in the repository': 'تشغيل Claude داخل المستودع',
+  'Inspect repository guidance': 'قراءة تعليمات المستودع',
+  'Add the official Next.js plugin marketplace': 'إضافة متجر Next.js الرسمي',
+  'Install the official Next.js plugin': 'تثبيت إضافة Next.js الرسمية',
+  'List project skills': 'عرض مهارات المشروع',
+  'Open Codex in the checkout': 'تشغيل Codex داخل نسخة المستودع',
+  'Read repository guidance': 'قراءة تعليمات المستودع',
+  'List repository skills': 'عرض مهارات المستودع',
+  'Install project skills into the Codex user library': 'تثبيت مهارات المشروع في مكتبة Codex للمستخدم',
+  'Trust repository-local Agent Skills': 'السماح بمهارات Agent Skills المحلية',
+  'Start Hermes in the repository': 'تشغيل Hermes داخل المستودع',
+  'List available Hermes skills': 'عرض مهارات Hermes المتاحة',
+  'Install project skills into Hermes': 'تثبيت مهارات المشروع داخل Hermes',
+  'Open the repository in Cursor': 'فتح المستودع في Cursor',
+  'Read the Graphite workflow': 'قراءة سير عمل Graphite',
+  'List shared Agent Skills': 'عرض Agent Skills المشتركة',
+  'Inspect Cursor project commands': 'فحص أوامر مشروع Cursor',
+  'Run workspace setup': 'تشغيل إعداد مساحة العمل',
+  'Run the development workspace': 'تشغيل مساحة عمل التطوير',
+  'List worktrees': 'عرض worktrees',
+  'Prune stale worktrees': 'تنظيف worktrees القديمة',
 }
 
 async function filesForPaths(paths: string[]) {
@@ -404,6 +428,10 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
   return Promise.all(
     definitions.map(async (definition) => ({
       ...definition,
+      commands: definition.commands.map((item) => ({
+        ...item,
+        labelAr: agentCommandLabelsAr[item.label] ?? item.label,
+      })),
       files: await filesForPaths(definition.paths),
     }))
   )
