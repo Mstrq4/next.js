@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, Copy } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useI18n } from './i18n-provider'
 
 export function CopyButton({
@@ -49,8 +49,8 @@ export function CommandBlock({
   description,
 }: {
   command: string
-  title?: string
-  description?: string
+  title?: ReactNode
+  description?: ReactNode
 }) {
   return (
     <div className="rounded-[18px] border border-border/70 bg-[#17051d] p-3 text-white dark:bg-black/25">
