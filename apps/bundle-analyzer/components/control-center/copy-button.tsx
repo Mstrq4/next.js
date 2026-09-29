@@ -46,16 +46,26 @@ export function CopyButton({
 export function CommandBlock({
   command,
   title,
+  titleAr,
   description,
+  descriptionAr,
 }: {
   command: string
   title?: string
+  titleAr?: string
   description?: string
+  descriptionAr?: string
 }) {
+  const { t } = useI18n()
+  const resolvedTitle = title ? t(title, titleAr ?? title) : null
+  const resolvedDescription = description
+    ? t(description, descriptionAr ?? description)
+    : null
+
   return (
     <div className="rounded-[18px] border border-border/70 bg-[#17051d] p-3 text-white dark:bg-black/25">
-      {title ? <p className="mb-1 text-xs font-medium text-[#eaddeb]">{title}</p> : null}
-      {description ? <p className="mb-3 text-[11px] leading-5 text-[#bfaec3]">{description}</p> : null}
+      {resolvedTitle ? <p className="mb-1 text-xs font-medium text-[#eaddeb]">{resolvedTitle}</p> : null}
+      {resolvedDescription ? <p className="mb-3 text-[11px] leading-5 text-[#bfaec3]">{resolvedDescription}</p> : null}
       <div className="flex items-start gap-3">
         <code className="min-w-0 flex-1 overflow-x-auto whitespace-pre-wrap break-all font-mono text-[11px] leading-5 text-[#e6d5e9]">
           {command}

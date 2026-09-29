@@ -115,11 +115,13 @@ export function ZipDownloadButton({
   files,
   filename,
   label,
+  labelAr,
   compact = false,
 }: {
   files: ZipSourceFile[]
   filename: string
   label?: string
+  labelAr?: string
   compact?: boolean
 }) {
   const [loading, setLoading] = useState(false)
@@ -178,7 +180,9 @@ export function ZipDownloadButton({
         ) : (
           <Archive className="size-4" />
         )}
-        {!compact ? <span>{label ?? t('Download ZIP', 'تنزيل ZIP')}</span> : null}
+        {!compact ? (
+          <span>{label ? t(label, labelAr ?? label) : t('Download ZIP', 'تنزيل ZIP')}</span>
+        ) : null}
       </button>
       {error && !compact ? <p className="max-w-xs text-[10px] text-destructive">{error}</p> : null}
     </div>
