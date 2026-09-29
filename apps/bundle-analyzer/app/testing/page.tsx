@@ -1,6 +1,7 @@
 import { Activity, Bug, FlaskConical, TestTube2 } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
 import { Localized } from '@/components/control-center/i18n-provider'
+import { LiveSmokeChecks } from '@/components/control-center/live-smoke-checks'
 import { TestingLabClient } from '@/components/control-center/testing-lab-client'
 import { GlassCard } from '@/components/control-center/ui'
 import { getRepoSnapshot } from '@/lib/control-center-data'
@@ -40,7 +41,9 @@ export default async function TestingPage() {
         </GlassCard>
       </div>
 
-      <div className="mb-6"><LiveSmokeChecks /></div>\n\n      <TestingLabClient availableTests={data.tests} />
+      <div className="mb-6"><LiveSmokeChecks /></div>
+
+      <TestingLabClient availableTests={data.tests} />
     </AppShell>
   )
 }
