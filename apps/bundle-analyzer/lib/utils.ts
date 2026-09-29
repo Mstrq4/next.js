@@ -3,12 +3,16 @@ import { twMerge } from 'tailwind-merge'
 import { SpecialModule } from './types'
 import { NetworkError } from './errors'
 import { AnalyzeData, SourceIndex } from './analyze-data'
+import { getLocalAnalyzerResponse } from './analyzer-local-files'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 export async function fetchStrict(url: string): Promise<Response> {
+  const local = await getLocalAnalyzerResponse(url)
+  if (local) return local
+
   let res: Response
   try {
     res = await fetch(url)
