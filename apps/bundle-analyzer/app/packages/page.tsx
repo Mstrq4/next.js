@@ -1,5 +1,6 @@
 import { Box, LockKeyhole, PackageOpen } from 'lucide-react'
 import { AppShell } from '@/components/control-center/app-shell'
+import { Localized } from '@/components/control-center/i18n-provider'
 import { GlassCard, Pill, SectionHeading } from '@/components/control-center/ui'
 import { getPackageCatalog } from '@/lib/control-center-data'
 
@@ -16,9 +17,9 @@ export default async function PackagesPage() {
       eyebrowAr="حزم المستودع الأحادي"
     >
       <SectionHeading
-        eyebrow="packages/"
-        title={`${packages.length} package surfaces`}
-        description="Package metadata is read directly from the monorepo at build time."
+        eyebrow={<Localized en="packages/" ar="packages/ · حزم المصدر" />}
+        title={<Localized en={`${packages.length} package surfaces`} ar={`${packages.length} سطح حزمة`} />}
+        description={<Localized en="Package metadata is read directly from the monorepo at build time." ar="تُقرأ بيانات الحزم مباشرة من المستودع الأحادي أثناء البناء." />}
       />
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -30,11 +31,11 @@ export default async function PackagesPage() {
               </span>
               {pkg.private ? (
                 <Pill>
-                  <LockKeyhole className="mr-1 size-3" />
-                  private
+                  <LockKeyhole className="me-1 size-3" />
+                  <Localized en="private" ar="خاصة" />
                 </Pill>
               ) : (
-                <Pill tone="success">publishable</Pill>
+                <Pill tone="success"><Localized en="publishable" ar="قابلة للنشر" /></Pill>
               )}
             </div>
             <p className="mt-5 truncate text-sm font-semibold">{pkg.name}</p>
