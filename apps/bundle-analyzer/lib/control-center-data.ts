@@ -257,7 +257,7 @@ export type AgentIntegration = {
   descriptionAr: string
   paths: string[]
   files: Array<{ path: string; url: string }>
-  commands: Array<{ label: string; command: string }>
+  commands: Array<{ label: string; labelAr?: string; command: string }>
 }
 
 async function filesForPaths(paths: string[]) {
@@ -290,8 +290,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'يستخدم جسر .claude/skills المحلي ومتجر إضافة Next.js وإرشادات CLAUDE.md.',
       paths: ['.claude', '.claude-plugin', '.github/CLAUDE.md'],
       commands: [
-        { label: 'Start Claude in the repository', command: 'claude' },
-        { label: 'Inspect repository guidance', command: 'cat AGENTS.md && cat .github/CLAUDE.md' },
+        { label: 'Start Claude in the repository', labelAr: 'تشغيل Claude داخل المستودع', command: 'claude' },
+        { label: 'Inspect repository guidance', labelAr: 'فحص تعليمات المستودع', command: 'cat AGENTS.md && cat .github/CLAUDE.md' },
       ],
     },
     {
@@ -305,8 +305,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'يقرأ تعليمات المستودع من AGENTS.md ويمكنه استخدام .agents/skills كسطح مشترك للمهارات.',
       paths: ['AGENTS.md', '.agents/skills'],
       commands: [
-        { label: 'Open Codex in the checkout', command: 'codex' },
-        { label: 'List repository skills', command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print' },
+        { label: 'Open Codex in the checkout', labelAr: 'تشغيل Codex داخل المستودع', command: 'codex' },
+        { label: 'List repository skills', labelAr: 'عرض مهارات المستودع', command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print' },
       ],
     },
     {
@@ -320,8 +320,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'يتعرف Hermes على .agents/skills داخل المشروع ويمكنه كذلك فحص مجلدات مهارات مشتركة خارجية.',
       paths: ['.agents/skills', 'AGENTS.md'],
       commands: [
-        { label: 'Start Hermes in the repository', command: 'hermes chat' },
-        { label: 'List available Hermes skills', command: 'hermes skills list' },
+        { label: 'Start Hermes in the repository', labelAr: 'تشغيل Hermes داخل المستودع', command: 'hermes chat' },
+        { label: 'List available Hermes skills', labelAr: 'عرض مهارات Hermes المتاحة', command: 'hermes skills list' },
       ],
     },
     {
@@ -335,8 +335,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'يستخدم أوامر Cursor وإعدادات worktree الموجودة داخل المستودع بما فيها سير عمل Graphite.',
       paths: ['.cursor'],
       commands: [
-        { label: 'Open the repository in Cursor', command: 'cursor .' },
-        { label: 'Read the Graphite workflow', command: 'cat .cursor/commands/gt-workflow.md' },
+        { label: 'Open the repository in Cursor', labelAr: 'فتح المستودع في Cursor', command: 'cursor .' },
+        { label: 'Read the Graphite workflow', labelAr: 'قراءة سير عمل Graphite', command: 'cat .cursor/commands/gt-workflow.md' },
       ],
     },
     {
@@ -350,8 +350,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
         'ينشئ worktrees معزولة لعدة وكلاء Claude Code مع سكربتات إعداد وتشغيل خاصة بالمستودع.',
       paths: ['.conductor'],
       commands: [
-        { label: 'Run workspace setup', command: './.conductor/scripts/setup.sh' },
-        { label: 'List worktrees', command: 'git worktree list' },
+        { label: 'Run workspace setup', labelAr: 'تشغيل إعداد مساحة العمل', command: './.conductor/scripts/setup.sh' },
+        { label: 'List worktrees', labelAr: 'عرض مساحات worktree', command: 'git worktree list' },
       ],
     },
   ]
@@ -362,6 +362,11 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       files: await filesForPaths(definition.paths),
     }))
   )
+}
+
+export async function getAgentDetail(slug: string) {
+  const agents = await getAgentIntegrations()
+  return agents.find((agent) => agent.slug === slug) ?? null
 }
 
 export async function getRepositorySurface() {
