@@ -246,7 +246,7 @@ export function AppShell({
             <button
               className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground lg:hidden"
               onClick={() => setMobileOpen(true)}
-              aria-label="Open navigation"
+              aria-label={t('Open navigation', 'فتح التنقل')}
             >
               <Menu className="size-4" />
             </button>
@@ -270,7 +270,7 @@ export function AppShell({
             <button
               onClick={() => setCommandOpen(true)}
               className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground md:hidden"
-              aria-label="Open command palette"
+              aria-label={t('Open command palette', 'فتح لوحة الأوامر')}
             >
               <Search className="size-4" />
             </button>
@@ -288,7 +288,7 @@ export function AppShell({
             <button
               onClick={toggleTheme}
               className="flex size-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition-transform active:scale-95"
-              aria-label="Toggle color theme"
+              aria-label={t('Toggle color theme', 'تبديل النمط اللوني')}
             >
               {dark ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </button>
@@ -325,9 +325,9 @@ export function AppShell({
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[80] bg-[#16001c]/30 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in" />
           <Dialog.Content className="nf-glass-strong fixed left-1/2 top-[18%] z-[90] w-[calc(100vw-24px)] max-w-xl -translate-x-1/2 overflow-hidden rounded-[26px] p-2 shadow-[0_30px_120px_rgba(29,0,35,.28)] focus:outline-none">
-            <Dialog.Title className="sr-only">Command center</Dialog.Title>
+            <Dialog.Title className="sr-only">{t('Command center', 'مركز الأوامر')}</Dialog.Title>
             <Dialog.Description className="sr-only">
-              Search and copy common repository commands.
+              {t('Search and copy common repository commands.', 'ابحث في أوامر المستودع الشائعة وانسخها.')}
             </Dialog.Description>
 
             <div className="flex items-center gap-3 border-b border-border px-3 py-2.5">
@@ -336,13 +336,13 @@ export function AppShell({
                 autoFocus
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Type a command or workflow…"
+                placeholder={t('Type a command or workflow…', 'اكتب أمرًا أو سير عمل…')}
                 className="h-9 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
               <button
                 onClick={() => setCommandOpen(false)}
                 className="flex size-8 items-center justify-center rounded-full bg-muted text-muted-foreground"
-                aria-label="Close"
+                aria-label={t('Close', 'إغلاق')}
               >
                 <X className="size-3.5" />
               </button>
@@ -350,7 +350,7 @@ export function AppShell({
 
             <div className="max-h-[52vh] overflow-y-auto p-2">
               <p className="px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-                Repository commands
+                {t('Repository commands', 'أوامر المستودع')}
               </p>
               <div className="space-y-1">
                 {filteredCommands.map((item) => {

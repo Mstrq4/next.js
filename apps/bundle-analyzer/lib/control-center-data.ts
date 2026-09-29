@@ -292,6 +292,9 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       commands: [
         { label: 'Start Claude in the repository', command: 'claude' },
         { label: 'Inspect repository guidance', command: 'cat AGENTS.md && cat .github/CLAUDE.md' },
+        { label: 'Add the official Next.js plugin marketplace', command: '/plugin marketplace add vercel/next.js' },
+        { label: 'Install the official Next.js plugin', command: '/plugin install nextjs@nextjs' },
+        { label: 'List project skills', command: 'find .claude/skills -maxdepth 2 -name SKILL.md -print' },
       ],
     },
     {
@@ -306,7 +309,9 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       paths: ['AGENTS.md', '.agents/skills'],
       commands: [
         { label: 'Open Codex in the checkout', command: 'codex' },
+        { label: 'Read repository guidance', command: 'cat AGENTS.md' },
         { label: 'List repository skills', command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print' },
+        { label: 'Install project skills into the Codex user library', command: 'mkdir -p ~/.codex/skills && cp -R .agents/skills/* ~/.codex/skills/' },
       ],
     },
     {
@@ -322,6 +327,7 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       commands: [
         { label: 'Start Hermes in the repository', command: 'hermes chat' },
         { label: 'List available Hermes skills', command: 'hermes skills list' },
+        { label: 'Install project skills into Hermes', command: 'mkdir -p ~/.hermes/skills/nextjs && cp -R .agents/skills/* ~/.hermes/skills/nextjs/' },
       ],
     },
     {
@@ -337,6 +343,8 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       commands: [
         { label: 'Open the repository in Cursor', command: 'cursor .' },
         { label: 'Read the Graphite workflow', command: 'cat .cursor/commands/gt-workflow.md' },
+        { label: 'List shared Agent Skills', command: 'find .agents/skills -maxdepth 2 -name SKILL.md -print' },
+        { label: 'Inspect Cursor project commands', command: 'find .cursor/commands -maxdepth 2 -type f -print' },
       ],
     },
     {
@@ -351,7 +359,9 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       paths: ['.conductor'],
       commands: [
         { label: 'Run workspace setup', command: './.conductor/scripts/setup.sh' },
+        { label: 'Run the development workspace', command: './.conductor/scripts/run.sh' },
         { label: 'List worktrees', command: 'git worktree list' },
+        { label: 'Prune stale worktrees', command: 'git worktree prune' },
       ],
     },
   ]
@@ -362,6 +372,11 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
       files: await filesForPaths(definition.paths),
     }))
   )
+}
+
+export async function getAgentIntegration(slug: string) {
+  const agents = await getAgentIntegrations()
+  return agents.find((agent) => agent.slug === slug) ?? null
 }
 
 export async function getRepositorySurface() {

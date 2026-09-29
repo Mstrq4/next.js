@@ -22,10 +22,10 @@ export function SectionHeading({
   description,
   action,
 }: {
-  eyebrow?: string
-  title: string
-  description?: string
-  action?: { href: string; label: string }
+  eyebrow?: ReactNode
+  title: ReactNode
+  description?: ReactNode
+  action?: { href: string; label: ReactNode }
 }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
@@ -63,9 +63,9 @@ export function StatCard({
   detail,
   icon,
 }: {
-  label: string
+  label: ReactNode
   value: string | number
-  detail: string
+  detail: ReactNode
   icon: ReactNode
 }) {
   return (
@@ -110,7 +110,7 @@ export function MetricBar({
   value,
   percent,
 }: {
-  label: string
+  label: ReactNode
   value: string
   percent: number
 }) {
@@ -136,8 +136,8 @@ export function EmptyState({
   description,
 }: {
   icon: ReactNode
-  title: string
-  description: string
+  title: ReactNode
+  description: ReactNode
 }) {
   return (
     <GlassCard className="flex min-h-72 flex-col items-center justify-center p-8 text-center">

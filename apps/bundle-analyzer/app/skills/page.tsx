@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/control-center/app-shell'
 import { SkillCatalog } from '@/components/control-center/skill-catalog'
+import { Localized } from '@/components/control-center/i18n-provider'
 import { GlassCard } from '@/components/control-center/ui'
 import { getSkillBundles, getSkillCatalog } from '@/lib/control-center-data'
 
@@ -19,19 +20,19 @@ export default async function SkillsPage() {
     >
       <div className="mb-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <GlassCard className="p-5">
-          <p className="text-xs text-muted-foreground">Total skills</p>
+          <Localized as="p" en="Total skills" ar="إجمالي المهارات" className="text-xs text-muted-foreground" />
           <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{skills.length}</p>
         </GlassCard>
         <GlassCard className="p-5">
-          <p className="text-xs text-muted-foreground">Repository skills</p>
+          <Localized as="p" en="Repository skills" ar="مهارات المستودع" className="text-xs text-muted-foreground" />
           <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{agentCount}</p>
         </GlassCard>
         <GlassCard className="p-5">
-          <p className="text-xs text-muted-foreground">Framework skills</p>
+          <Localized as="p" en="Framework skills" ar="مهارات الإطار" className="text-xs text-muted-foreground" />
           <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{frameworkCount}</p>
         </GlassCard>
         <GlassCard className="p-5">
-          <p className="text-xs text-muted-foreground">Skill bundles</p>
+          <Localized as="p" en="Skill bundles" ar="حزم المهارات" className="text-xs text-muted-foreground" />
           <p className="mt-2 text-3xl font-semibold tracking-[-0.04em]">{bundles.length}</p>
         </GlassCard>
       </div>
