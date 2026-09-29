@@ -73,7 +73,7 @@ export default async function SkillDetailPage({
       title={skill.name}
       titleAr={skill.name}
       subtitle={skill.description}
-      subtitleAr={skill.description}
+      subtitleAr={skill.descriptionAr}
       eyebrow="Skill detail"
       eyebrowAr="تفاصيل المهارة"
     >
@@ -129,9 +129,15 @@ export default async function SkillDetailPage({
             />
             <Localized
               as="p"
+              en={skill.description}
+              ar={skill.descriptionAr}
+              className="mt-2 text-sm leading-6 text-muted-foreground"
+            />
+            <Localized
+              as="p"
               en="Install to the shared Agent Skills directory first, then expose the same skill to the agent-specific library you use."
               ar="ثبّت المهارة أولًا داخل مجلد Agent Skills المشترك، ثم انقلها إلى مكتبة الوكيل الذي تستخدمه."
-              className="mt-2 text-sm leading-6 text-muted-foreground"
+              className="mt-3 text-sm leading-6 text-muted-foreground"
             />
             <div className="mt-4 space-y-3">
               <CommandBlock title="Bash · shared project skill" command={sharedCommand} />
