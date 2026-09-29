@@ -92,7 +92,7 @@ export function AgentHub({ agents }: { agents: AgentIntegration[] }) {
                       </p>
                       <div className="space-y-2">
                         {agent.commands.map((item) => (
-                          <CommandBlock key={item.command} title={item.label} command={item.command} />
+                          <CommandBlock key={item.command} title={t(item.label, item.labelAr ?? item.label)} command={item.command} />
                         ))}
                       </div>
                     </div>

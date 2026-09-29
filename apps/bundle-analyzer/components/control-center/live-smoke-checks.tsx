@@ -58,6 +58,30 @@ const checks: Array<Omit<CheckResult, 'status'>> = [
     target: '/repository',
   },
   {
+    id: 'insights',
+    name: 'Repository insights',
+    nameAr: 'تحليلات المستودع',
+    target: '/insights',
+  },
+  {
+    id: 'analyze',
+    name: 'Live analyzer',
+    nameAr: 'المحلل الحي',
+    target: '/analyze',
+  },
+  {
+    id: 'compare',
+    name: 'Live comparison',
+    nameAr: 'المقارنة الحية',
+    target: '/compare',
+  },
+  {
+    id: 'workflows',
+    name: 'Workflow console',
+    nameAr: 'لوحة سير العمل',
+    target: '/workflows',
+  },
+  {
     id: 'github',
     name: 'Vercel Next.js GitHub API',
     nameAr: 'واجهة GitHub لمستودع Vercel',

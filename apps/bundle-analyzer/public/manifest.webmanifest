@@ -2,18 +2,51 @@
   "name": "Next Forge",
   "short_name": "Next Forge",
   "description": "Bilingual engineering intelligence and operational documentation for the Next.js repository.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone"],
   "background_color": "#130018",
   "theme_color": "#25002f",
   "orientation": "any",
+  "lang": "en",
+  "dir": "auto",
+  "categories": ["developer", "productivity", "utilities"],
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
     {
       "src": "/next-forge-mark.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Skills",
+      "short_name": "Skills",
+      "url": "/skills"
+    },
+    {
+      "name": "Agents",
+      "short_name": "Agents",
+      "url": "/agents"
+    },
+    {
+      "name": "Repository Insights",
+      "short_name": "Insights",
+      "url": "/insights"
+    },
+    {
+      "name": "Documentation",
+      "short_name": "Docs",
+      "url": "/docs"
     }
   ]
 }

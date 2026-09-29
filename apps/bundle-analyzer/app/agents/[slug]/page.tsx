@@ -63,7 +63,7 @@ export default async function AgentDetailPage({
             {agent.commands.map((item) => (
               <CommandBlock
                 key={item.command}
-                title={item.label}
+                title={<Localized en={item.label} ar={item.labelAr ?? item.label} />}
                 command={item.command}
               />
             ))}

@@ -129,6 +129,7 @@ export type SkillCatalogItem = {
   group: 'Agent skill' | 'Framework skill'
   bundle: string
   description: string
+  descriptionAr: string
   path: string
   content: string
   files: Array<{ path: string; url: string }>
@@ -149,6 +150,38 @@ const bundles: Record<string, string[]> = {
     'v8-jit',
   ],
   Documentation: ['authoring-skills', 'insight-error-page', 'update-docs', 'write-api-reference', 'write-guide'],
+}
+
+const skillDescriptionsAr: Record<string, string> = {
+  'authoring-skills': 'إرشادات إنشاء وصيانة مهارات الوكلاء داخل مستودع Next.js وفق بنية SKILL.md المعتمدة.',
+  'backport-pr': 'سير عمل لنقل تغييرات Pull Request محددة إلى فروع إصدارات سابقة بأمان.',
+  'create-pr': 'إرشادات تجهيز Pull Request قابل للمراجعة مع الوصف والفحوصات والأدلة المطلوبة.',
+  'dce-edge': 'تشخيص سلوك إزالة الكود غير المستخدم في بيئات Edge والبناء المرتبط بها.',
+  'deploy-release-test': 'اختبار مخرجات الإصدارات من خلال مسارات نشر وتجارب إصدار فعلية.',
+  flags: 'فحص والعمل مع Feature Flags الخاصة بإطار Next.js.',
+  'gate-tests': 'اختيار وتشغيل بوابات الاختبار المناسبة بحسب نوع التغيير في المستودع.',
+  'gh-stack': 'العمل مع Pull Requests متسلسلة ومكدسة باستخدام GitHub وGraphite.',
+  'insight-error-page': 'تشخيص وتحسين تجربة صفحات الخطأ في Next.js وأدوات التطوير.',
+  'next-rspack': 'تطوير واختبار تكامل Next.js مع Rspack ومسارات التحقق المرتبطة به.',
+  'pr-status-triage': 'تحليل حالات Pull Request ونتائج CI وتحديد سبب الفشل والخطوة التالية.',
+  'react-sync': 'مزامنة إصدارات React canary المستخدمة داخل مساحة عمل Next.js.',
+  'react-vendoring': 'صيانة حدود حزم React المضمنة وآلية vendoring داخل الإطار.',
+  'router-act': 'العمل على Router Actions وسلوك التنقل والتحديث داخل Next.js.',
+  'runtime-debug': 'تشخيص أخطاء بيئة تشغيل الإطار والانحدارات السلوكية أثناء التطوير.',
+  'sandbox-bench': 'تشغيل وقياس سيناريوهات Sandbox والتطوير المعزولة ومقارنة الأداء.',
+  'update-docs': 'تحديث توثيق Next.js بحيث يظل متوافقًا مع التغييرات البرمجية الحالية.',
+  'v8-jit': 'تحليل تأثيرات V8 وJIT على الأداء والسلوك الحساس لتحسينات JavaScript.',
+  'write-api-reference': 'إنشاء مراجع API واضحة ومتوافقة مع أسلوب توثيق Next.js.',
+  'write-guide': 'إنشاء أدلة استخدام عملية عالية الجودة لمزايا وسلوكيات Next.js.',
+  'next-cache-components-adoption': 'اعتماد Cache Components بأمان داخل مشاريع App Router مع الحفاظ على السلوك المتوقع.',
+  'next-cache-components-optimizer': 'تحسين Cache Components لزيادة الجزء الثابت المفيد وتقليل العمل الديناميكي غير الضروري.',
+  'next-dev-loop': 'التحقق من تطوير Next.js عبر دورة تطوير حية تشمل التشغيل والملاحظة وإعادة الاختبار.',
+  'next-partial-prefetching-adoption': 'اعتماد Partial Prefetching مع الحفاظ على سلوك التنقل والتحميل المتوقع.',
+  'next-partial-prefetching-optimizer': 'تحسين عقود Partial Prefetching بعد الاعتماد لرفع الكفاءة وتقليل الجلب غير الضروري.',
+}
+
+function skillDescriptionAr(slug: string) {
+  return skillDescriptionsAr[slug] ?? 'سير عمل هندسي واعٍ بالمستودع ومخصص لتطوير Next.js والعمل مع أدواته ووكلائه.'
 }
 
 function bundleForSkill(name: string, group: SkillCatalogItem['group']) {
@@ -178,6 +211,7 @@ async function loadSkill(
       parsed.fields.description ||
       firstParagraph(parsed.body) ||
       'Repository-aware development workflow.',
+    descriptionAr: skillDescriptionAr(slug),
     path: skillPath,
     content: source,
     files: files.map((filePath) => ({ path: filePath, url: rawUrl(filePath) })),
@@ -257,7 +291,31 @@ export type AgentIntegration = {
   descriptionAr: string
   paths: string[]
   files: Array<{ path: string; url: string }>
-  commands: Array<{ label: string; command: string }>
+  commands: Array<{ label: string; labelAr?: string; command: string }>
+}
+
+const agentCommandLabelsAr: Record<string, string> = {
+  'Start Claude in the repository': 'تشغيل Claude داخل المستودع',
+  'Inspect repository guidance': 'قراءة تعليمات المستودع',
+  'Add the official Next.js plugin marketplace': 'إضافة متجر Next.js الرسمي',
+  'Install the official Next.js plugin': 'تثبيت إضافة Next.js الرسمية',
+  'List project skills': 'عرض مهارات المشروع',
+  'Open Codex in the checkout': 'تشغيل Codex داخل نسخة المستودع',
+  'Read repository guidance': 'قراءة تعليمات المستودع',
+  'List repository skills': 'عرض مهارات المستودع',
+  'Install project skills into the Codex user library': 'تثبيت مهارات المشروع في مكتبة Codex للمستخدم',
+  'Trust repository-local Agent Skills': 'السماح بمهارات Agent Skills المحلية',
+  'Start Hermes in the repository': 'تشغيل Hermes داخل المستودع',
+  'List available Hermes skills': 'عرض مهارات Hermes المتاحة',
+  'Install project skills into Hermes': 'تثبيت مهارات المشروع داخل Hermes',
+  'Open the repository in Cursor': 'فتح المستودع في Cursor',
+  'Read the Graphite workflow': 'قراءة سير عمل Graphite',
+  'List shared Agent Skills': 'عرض Agent Skills المشتركة',
+  'Inspect Cursor project commands': 'فحص أوامر مشروع Cursor',
+  'Run workspace setup': 'تشغيل إعداد مساحة العمل',
+  'Run the development workspace': 'تشغيل مساحة عمل التطوير',
+  'List worktrees': 'عرض worktrees',
+  'Prune stale worktrees': 'تنظيف worktrees القديمة',
 }
 
 async function filesForPaths(paths: string[]) {
@@ -370,6 +428,10 @@ export async function getAgentIntegrations(): Promise<AgentIntegration[]> {
   return Promise.all(
     definitions.map(async (definition) => ({
       ...definition,
+      commands: definition.commands.map((item) => ({
+        ...item,
+        labelAr: agentCommandLabelsAr[item.label] ?? item.label,
+      })),
       files: await filesForPaths(definition.paths),
     }))
   )

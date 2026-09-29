@@ -3,16 +3,19 @@
 import {
   Archive,
   BookOpen,
+  Check,
   Download,
   FolderCode,
+  Layers3,
   Search,
   Sparkles,
   TerminalSquare,
+  X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type { SkillCatalogItem } from '@/lib/control-center-data'
-import { CommandBlock } from './copy-button'
+import { CommandBlock, CopyButton } from './copy-button'
 import { ZipDownloadButton } from './zip-download-button'
 import { useI18n } from './i18n-provider'
 import { GlassCard, Pill } from './ui'
@@ -66,6 +69,7 @@ export function SkillCatalog({
   const [bundle, setBundle] = useState('All')
   const [target, setTarget] = useState<InstallTarget>('shared')
   const [shell, setShell] = useState<Shell>('bash')
+  const [selected, setSelected] = useState<Set<string>>(() => new Set())
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -75,6 +79,7 @@ export function SkillCatalog({
         !needle ||
         skill.name.toLowerCase().includes(needle) ||
         skill.description.toLowerCase().includes(needle) ||
+        skill.descriptionAr.toLowerCase().includes(needle) ||
         skill.path.toLowerCase().includes(needle)
       return matchesBundle && matchesQuery
     })
@@ -89,6 +94,33 @@ export function SkillCatalog({
       ? bashInstall(installItems, target)
       : powershellInstall(installItems, target)
   const allFiles = skills.flatMap((skill) => skill.files)
+  const selectedItems = skills.filter((skill) => selected.has(skill.slug))
+  const selectedFiles = selectedItems.flatMap((skill) => skill.files)
+  const selectedCommand =
+    selectedItems.length === 0
+      ? ''
+      : shell === 'bash'
+        ? bashInstall(selectedItems, target)
+        : powershellInstall(selectedItems, target)
+
+  const toggleSelected = (slug: string) => {
+    setSelected((current) => {
+      const next = new Set(current)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
+      return next
+    })
+  }
+
+  const selectFiltered = () => {
+    setSelected((current) => {
+      const next = new Set(current)
+      for (const skill of filtered) next.add(skill.slug)
+      return next
+    })
+  }
+
+  const clearSelected = () => setSelected(new Set())
 
   const targetLabels: Array<{ id: InstallTarget; en: string; ar: string }> = [
     { id: 'shared', en: 'Project / Cursor shared', ar: 'المشروع / Cursor مشترك' },
@@ -119,6 +151,65 @@ export function SkillCatalog({
           label={t('Download all skills', 'تنزيل جميع المهارات')}
         />
       </div>
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={selectFiltered}
+          className="inline-flex min-h-9 items-center gap-2 rounded-full border border-border bg-background/55 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Layers3 className="size-3.5" />
+          {t('Select visible skills', 'تحديد المهارات الظاهرة')}
+        </button>
+        {selected.size > 0 ? (
+          <>
+            <span className="rounded-full bg-primary/10 px-3 py-2 text-xs font-medium text-primary">
+              {t(`${selected.size} selected`, `${selected.size} محددة`)}
+            </span>
+            <button
+              type="button"
+              onClick={clearSelected}
+              className="inline-flex min-h-9 items-center gap-2 rounded-full bg-muted px-3 text-xs font-medium text-muted-foreground"
+            >
+              <X className="size-3.5" />
+              {t('Clear selection', 'مسح التحديد')}
+            </button>
+          </>
+        ) : null}
+      </div>
+
+      {selectedItems.length > 0 ? (
+        <GlassCard className="mb-7 border-primary/15 p-5 sm:p-6">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2">
+                <Check className="size-4 text-primary" />
+                <h2 className="font-semibold">{t('Custom skill bundle', 'حزمة مهارات مخصصة')}</h2>
+                <Pill tone="violet">
+                  {t(`${selectedItems.length} skills`, `${selectedItems.length} مهارة`)}
+                </Pill>
+              </div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t(
+                  'Install or download exactly the skills you selected. The same agent target and shell choices below are reused here.',
+                  'ثبّت أو نزّل المهارات التي حددتها فقط. يتم استخدام نفس الوكيل ونوع الطرفية المحددين أدناه.'
+                )}
+              </p>
+            </div>
+            <ZipDownloadButton
+              files={selectedFiles}
+              filename="nextjs-custom-skills.zip"
+              label={t('Download selected', 'تنزيل المحدد')}
+            />
+          </div>
+          <div className="mt-4">
+            <CommandBlock
+              title={t('Install selected skills', 'تثبيت المهارات المحددة')}
+              command={selectedCommand}
+            />
+          </div>
+        </GlassCard>
+      ) : null}
 
       <div className="mb-7 flex gap-2 overflow-x-auto pb-1">
         <button
@@ -223,9 +314,19 @@ export function SkillCatalog({
         {filtered.map((skill) => (
           <article key={skill.path} className="nf-glass group flex min-h-[280px] flex-col rounded-[24px] p-5">
             <div className="flex items-start justify-between gap-3">
-              <span className="flex size-10 items-center justify-center rounded-[15px] bg-primary/10 text-primary">
-                <Sparkles className="size-4.5" />
-              </span>
+              <button
+                type="button"
+                onClick={() => toggleSelected(skill.slug)}
+                aria-pressed={selected.has(skill.slug)}
+                aria-label={selected.has(skill.slug) ? t('Remove from selection', 'إزالة من التحديد') : t('Add to selection', 'إضافة إلى التحديد')}
+                className={`flex size-10 items-center justify-center rounded-[15px] transition-colors ${
+                  selected.has(skill.slug)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-primary/10 text-primary'
+                }`}
+              >
+                {selected.has(skill.slug) ? <Check className="size-4.5" /> : <Sparkles className="size-4.5" />}
+              </button>
               <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
                 {skill.bundle}
               </span>
@@ -233,7 +334,7 @@ export function SkillCatalog({
 
             <h3 className="mt-5 font-semibold tracking-[-0.02em]">{skill.name}</h3>
             <p className="mt-2 line-clamp-4 text-sm leading-6 text-muted-foreground">
-              {skill.description}
+              {t(skill.description, skill.descriptionAr)}
             </p>
 
             <div className="mt-auto pt-5">
@@ -249,6 +350,10 @@ export function SkillCatalog({
                   <BookOpen className="size-3.5" />
                   {t('View skill', 'عرض المهارة')}
                 </Link>
+                <CopyButton
+                  value={shell === 'bash' ? bashInstall([skill], target) : powershellInstall([skill], target)}
+                  compact
+                />
                 <ZipDownloadButton files={skill.files} filename={skill.slug + '.zip'} compact />
               </div>
             </div>
