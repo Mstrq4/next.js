@@ -16,6 +16,8 @@ import {
   Languages,
   Menu,
   Moon,
+  PanelLeftClose,
+  PanelLeftOpen,
   Play,
   Search,
   Sparkles,
@@ -99,9 +101,11 @@ export function AppShell({
   const [query, setQuery] = useState('')
   const [toast, setToast] = useState<string | null>(null)
   const [dark, setDark] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains('dark'))
+    setCollapsed(localStorage.getItem('next-forge-sidebar') === 'collapsed')
   }, [])
 
   useEffect(() => {
@@ -144,9 +148,17 @@ export function AppShell({
     setCommandOpen(false)
   }
 
-  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => (
+  const toggleSidebar = () => {
+    const next = !collapsed
+    setCollapsed(next)
+    localStorage.setItem('next-forge-sidebar', next ? 'collapsed' : 'expanded')
+  }
+
+  const Sidebar = ({ mobile = false }: { mobile?: boolean }) => {
+    const compact = collapsed && !mobile
+    return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center gap-3 px-3 py-3">
+      <div className={`flex items-center px-3 py-3 ${compact ? 'justify-center' : 'gap-3'}`}>
         <div className="flex size-11 items-center justify-center rounded-[18px] bg-[#25002f] shadow-[0_12px_30px_rgba(79,16,89,.22)]">
           {/* eslint-disable-next-line @next/next/no-img-element -- local UI brand mark; fixed dimensions and no optimization needed */}
           <img
@@ -157,10 +169,12 @@ export function AppShell({
             className="size-9 object-contain"
           />
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold tracking-[-0.02em]">Next Forge</p>
-          <p className="truncate text-[11px] text-muted-foreground">{t('Engineering Console', 'لوحة الهندسة')}</p>
-        </div>
+        {!compact ? (
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold tracking-[-0.02em]">Next Forge</p>
+            <p className="truncate text-[11px] text-muted-foreground">{t('Engineering Console', 'لوحة الهندسة')}</p>
+          </div>
+        ) : null}
       </div>
 
       <div className="my-4 h-px bg-border" />
@@ -168,9 +182,13 @@ export function AppShell({
       <nav className="flex-1 space-y-6 overflow-y-auto pb-6">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-              {t(group.label, group.labelAr)}
-            </p>
+            {!compact ? (
+              <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
+                {t(group.label, group.labelAr)}
+              </p>
+            ) : (
+              <div className="mx-auto mb-2 h-px w-7 bg-border" />
+            )}
             <div className="space-y-1">
               {group.items.map((item) => {
                 const Icon = item.icon
@@ -181,15 +199,16 @@ export function AppShell({
                     key={item.href}
                     href={item.href}
                     onClick={() => mobile && setMobileOpen(false)}
-                    className={`group flex min-h-10 items-center gap-3 rounded-[14px] px-3 text-sm transition-all duration-200 ${
+                    title={compact ? t(item.label, item.labelAr) : undefined}
+                    className={`group flex min-h-10 items-center rounded-[14px] text-sm transition-all duration-200 ${compact ? 'justify-center px-2' : 'gap-3 px-3'} ${
                       active
                         ? 'bg-primary/10 font-medium text-primary shadow-[inset_0_0_0_1px_rgba(173,120,176,.08)]'
                         : 'text-muted-foreground hover:bg-primary/[0.055] hover:text-foreground'
                     }`}
                   >
                     <Icon className="size-[17px] shrink-0" strokeWidth={1.8} />
-                    <span className="flex-1 truncate">{t(item.label, item.labelAr)}</span>
-                    {active ? <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" /> : null}
+                    {!compact ? <span className="flex-1 truncate">{t(item.label, item.labelAr)}</span> : null}
+                    {active && !compact ? <ChevronRight className="size-3.5 opacity-50 rtl:rotate-180" /> : null}
                   </Link>
                 )
               })}
@@ -202,19 +221,38 @@ export function AppShell({
         <Link
           href="/repository"
           onClick={() => mobile && setMobileOpen(false)}
-          className="flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground"
+          title={compact ? t('Repository explorer', 'مستكشف المستودع') : undefined}
+          className={`flex items-center rounded-[14px] py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground ${compact ? 'justify-center px-2' : 'gap-3 px-3'}`}
         >
           <GitBranch className="size-[17px]" strokeWidth={1.8} />
-          <span className="flex-1">{t('Repository explorer', 'مستكشف المستودع')}</span>
-          <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px]">canary</span>
+          {!compact ? (
+            <>
+              <span className="flex-1">{t('Repository explorer', 'مستكشف المستودع')}</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 font-mono text-[10px]">canary</span>
+            </>
+          ) : null}
         </Link>
+
+        {!mobile ? (
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className={`mt-1 flex w-full items-center rounded-[14px] py-2.5 text-sm text-muted-foreground transition-colors hover:bg-primary/[0.055] hover:text-foreground ${compact ? 'justify-center px-2' : 'gap-3 px-3'}`}
+            aria-label={compact ? t('Expand sidebar', 'توسيع الشريط الجانبي') : t('Collapse sidebar', 'طي الشريط الجانبي')}
+            title={compact ? t('Expand sidebar', 'توسيع الشريط الجانبي') : t('Collapse sidebar', 'طي الشريط الجانبي')}
+          >
+            {compact ? <PanelLeftOpen className="size-[17px]" /> : <PanelLeftClose className="size-[17px]" />}
+            {!compact ? <span>{t('Collapse sidebar', 'طي الشريط الجانبي')}</span> : null}
+          </button>
+        ) : null}
       </div>
     </div>
   )
+  }
 
   return (
     <div className="min-h-screen">
-      <aside className="fixed inset-y-4 left-4 z-30 hidden w-[252px] rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl lg:block rtl:left-auto rtl:right-4">
+      <aside className={`fixed inset-y-4 left-4 z-30 hidden rounded-[28px] border border-border/80 bg-sidebar/80 p-3 shadow-[0_24px_90px_rgba(56,12,65,.08)] backdrop-blur-3xl transition-[width] duration-300 lg:block rtl:left-auto rtl:right-4 ${collapsed ? 'w-[88px]' : 'w-[252px]'}`}>
         <Sidebar />
       </aside>
 
@@ -240,7 +278,7 @@ export function AppShell({
         </div>
       ) : null}
 
-      <main className="min-w-0 lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]">
+      <main className={`min-w-0 transition-[padding] duration-300 ${collapsed ? 'lg:pl-[120px] rtl:lg:pl-0 rtl:lg:pr-[120px]' : 'lg:pl-[284px] rtl:lg:pl-0 rtl:lg:pr-[284px]'}`}>
         <div className="mx-auto w-full max-w-[1720px] px-4 pb-12 pt-4 sm:px-6 lg:px-7">
           <header className="nf-glass sticky top-4 z-20 mb-6 flex min-h-16 items-center gap-3 rounded-[22px] px-3.5 sm:px-4">
             <button
@@ -325,9 +363,9 @@ export function AppShell({
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-[80] bg-[#16001c]/30 backdrop-blur-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in" />
           <Dialog.Content className="nf-glass-strong fixed left-1/2 top-[18%] z-[90] w-[calc(100vw-24px)] max-w-xl -translate-x-1/2 overflow-hidden rounded-[26px] p-2 shadow-[0_30px_120px_rgba(29,0,35,.28)] focus:outline-none">
-            <Dialog.Title className="sr-only">Command center</Dialog.Title>
+            <Dialog.Title className="sr-only">{t('Command center', 'مركز الأوامر')}</Dialog.Title>
             <Dialog.Description className="sr-only">
-              Search and copy common repository commands.
+              {t('Search and copy common repository commands.', 'ابحث في أوامر المستودع الشائعة وانسخها.')}
             </Dialog.Description>
 
             <div className="flex items-center gap-3 border-b border-border px-3 py-2.5">
@@ -336,7 +374,7 @@ export function AppShell({
                 autoFocus
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Type a command or workflow…"
+                placeholder={t('Type a command or workflow…', 'اكتب أمرًا أو سير عمل…')}
                 className="h-9 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
               <button
@@ -350,7 +388,7 @@ export function AppShell({
 
             <div className="max-h-[52vh] overflow-y-auto p-2">
               <p className="px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
-                Repository commands
+                {t('Repository commands', 'أوامر المستودع')}
               </p>
               <div className="space-y-1">
                 {filteredCommands.map((item) => {
