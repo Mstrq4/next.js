@@ -55,7 +55,7 @@ const sections = [
       { title: 'Codex user skills', command: 'mkdir -p ~/.codex/skills && cp -R .agents/skills/* ~/.codex/skills/' },
       { title: 'Claude project skills', command: 'mkdir -p .claude/skills && cp -R .agents/skills/* .claude/skills/' },
       { title: 'Trust Hermes project skills', command: 'hermes skills trust' },\n      { title: 'Hermes user skills', command: 'mkdir -p ~/.hermes/skills/nextjs && cp -R .agents/skills/* ~/.hermes/skills/nextjs/' },\n      { title: 'List Hermes skills', command: 'hermes skills list' },
-      { title: 'Windows Codex skills', command: 'New-Item -ItemType Directory -Force -Path "$HOME\.codex\skills" | Out-Null; Copy-Item -Recurse -Force ".agents\skills\*" "$HOME\.codex\skills\"' },
+      { title: 'Windows Codex skills', command: 'New-Item -ItemType Directory -Force -Path "$HOME\\.codex\\skills" | Out-Null; Copy-Item -Recurse -Force ".agents\\skills\\*" "$HOME\\.codex\\skills\\"' },
     ],
   },
   {
