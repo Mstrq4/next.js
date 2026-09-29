@@ -10,6 +10,7 @@ import {
   Network,
   TerminalSquare,
 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import type { AgentIntegration } from '@/lib/control-center-data'
 import { CommandBlock } from './copy-button'
@@ -101,11 +102,19 @@ export function AgentHub({ agents }: { agents: AgentIntegration[] }) {
                         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-primary/70">
                           {t('Repository files', 'ملفات المستودع')}
                         </p>
-                        <ZipDownloadButton
-                          files={agent.files}
-                          filename={'nextjs-' + agent.slug + '-bundle.zip'}
-                          compact
-                        />
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={'/agents/' + agent.slug}
+                            className="inline-flex min-h-9 items-center rounded-full border border-border bg-background/55 px-3 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          >
+                            {t('View integration', 'عرض التكامل')}
+                          </Link>
+                          <ZipDownloadButton
+                            files={agent.files}
+                            filename={'nextjs-' + agent.slug + '-bundle.zip'}
+                            compact
+                          />
+                        </div>
                       </div>
                       <div className="max-h-64 space-y-1 overflow-y-auto">
                         {agent.paths.map((path) => (
